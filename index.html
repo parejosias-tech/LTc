@@ -1,1631 +1,2683 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LTcine TV - Actualités • Reportages • Évangélisation</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary-blue: #2563EB;
-            --primary-yellow: #FCD34D;
-            --dark-blue: #1E3A8A;
-            --light-blue: #DBEAFE;
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 50%, #0F172A 100%);
-            min-height: 100vh;
-            overflow-x: hidden;
-            color: #fff;
-            line-height: 1.6;
-        }
-
-        /* Animated Background */
-        .bg-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            overflow: hidden;
-        }
-
-        .bg-animation::before,
-        .bg-animation::after {
-            content: '';
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.3;
-            animation: float 20s infinite ease-in-out;
-        }
-
-        .bg-animation::before {
-            width: 600px;
-            height: 600px;
-            background: var(--primary-blue);
-            top: -200px;
-            right: -200px;
-        }
-
-        .bg-animation::after {
-            width: 500px;
-            height: 500px;
-            background: var(--primary-yellow);
-            bottom: -150px;
-            left: -150px;
-            animation-delay: -10s;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(50px, -50px) scale(1.1); }
-            66% { transform: translate(-30px, 30px) scale(0.9); }
-        }
-
-        /* Header */
-        header {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 1rem 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .logo-svg {
-            width: 100px;
-            height: 75px;
-            filter: drop-shadow(0 4px 8px rgba(37, 99, 235, 0.3));
-        }
-
-        .site-title {
-            font-size: 2.2rem;
-            font-weight: 900;
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            letter-spacing: -1px;
-        }
-
-        .site-title span {
-            color: var(--primary-yellow);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            position: relative;
-            padding: 0.5rem 0;
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary-yellow);
-            transition: width 0.3s ease;
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 0.5rem;
-        }
-
-        /* Breaking News Ticker */
-        .ticker-container {
-            background: linear-gradient(90deg, var(--primary-blue), var(--dark-blue));
-            padding: 1rem 0;
-            overflow: hidden;
-            position: relative;
-            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
-        }
-
-        .ticker-label {
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            background: var(--primary-yellow);
-            color: var(--dark-blue);
-            padding: 1rem 2rem;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            z-index: 10;
-            box-shadow: 4px 0 15px rgba(0,0,0,0.3);
-            font-size: 1.1rem;
-        }
-
-        .ticker-label i {
-            margin-right: 0.5rem;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .ticker-wrapper {
-            margin-left: 180px;
-            overflow: hidden;
-        }
-
-        .ticker-content {
-            display: flex;
-            animation: ticker 40s linear infinite;
-            white-space: nowrap;
-        }
-
-        .ticker-item {
-            color: white;
-            padding: 0 3rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 1.05rem;
-        }
-
-        .ticker-item::before {
-            content: '●';
-            color: var(--primary-yellow);
-            font-size: 0.8rem;
-        }
-
-        @keyframes ticker {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
-        /* Hero Section */
-        .hero {
-            padding: 4rem 2rem;
-            text-align: center;
-            position: relative;
-        }
-
-        .hero-content {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .hero h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 3.5rem;
-            font-weight: 900;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(135deg, #fff 0%, var(--primary-yellow) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 4px 20px rgba(252, 211, 77, 0.3);
-        }
-
-        .hero p {
-            font-size: 1.3rem;
-            color: rgba(255,255,255,0.9);
-            margin-bottom: 2rem;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .objectives {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .objective-tag {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            padding: 0.8rem 1.5rem;
-            border-radius: 50px;
-            font-weight: 600;
-            color: white;
-            transition: all 0.3s ease;
-            box-shadow: var(--glass-shadow);
-        }
-
-        .objective-tag:hover {
-            background: var(--primary-blue);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5);
-        }
-
-        /* Main Container */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        /* Section Styles */
-        .section {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 3rem;
-            margin-bottom: 3rem;
-            box-shadow: var(--glass-shadow);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary-blue), var(--primary-yellow));
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            margin-bottom: 2.5rem;
-        }
-
-        .section-icon {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
-            border-radius: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            color: white;
-            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
-            flex-shrink: 0;
-        }
-
-        .section-title {
-            font-size: 2.2rem;
-            font-weight: 800;
-            color: white;
-            line-height: 1.2;
-        }
-
-        .section-subtitle {
-            font-size: 1rem;
-            color: rgba(255,255,255,0.7);
-            margin-top: 0.3rem;
-        }
-
-        /* Verse Section */
-        .verse-content {
-            position: relative;
-            padding: 2rem;
-            background: rgba(252, 211, 77, 0.05);
-            border-radius: 16px;
-            border-left: 4px solid var(--primary-yellow);
-        }
-
-        .verse-text {
-            font-size: 1.4rem;
-            line-height: 1.8;
-            color: white;
-            font-style: italic;
-            margin-bottom: 1.5rem;
-            font-family: 'Playfair Display', serif;
-        }
-
-        .verse-reference {
-            text-align: right;
-            color: var(--primary-yellow);
-            font-weight: 700;
-            font-size: 1.2rem;
-        }
-
-        /* News Section */
-        .news-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-            gap: 2rem;
-        }
-
-        .news-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            overflow: hidden;
-            transition: all 0.4s ease;
-            box-shadow: var(--glass-shadow);
-        }
-
-        .news-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 40px rgba(37, 99, 235, 0.4);
-            border-color: var(--primary-blue);
-        }
-
-        .news-image {
-            width: 100%;
-            height: 220px;
-            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4rem;
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .news-image::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-            animation: shimmer 3s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        .news-category {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: var(--primary-yellow);
-            color: var(--dark-blue);
-            padding: 0.4rem 1rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            z-index: 2;
-        }
-
-        .news-content {
-            padding: 1.8rem;
-        }
-
-        .news-date {
-            color: var(--primary-yellow);
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .news-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 1rem;
-            line-height: 1.3;
-        }
-
-        .news-excerpt {
-            color: rgba(255,255,255,0.8);
-            line-height: 1.7;
-            margin-bottom: 1.5rem;
-            font-size: 0.95rem;
-        }
-
-        .news-read-more {
-            color: var(--primary-yellow);
-            text-decoration: none;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: gap 0.3s ease;
-            font-size: 0.95rem;
-        }
-
-        .news-read-more:hover {
-            gap: 1rem;
-        }
-
-        /* Live Section */
-        .live-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .live-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 2rem;
-            transition: all 0.3s ease;
-            box-shadow: var(--glass-shadow);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .live-card::before {
-            content: 'LIVE';
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: #EF4444;
-            color: white;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 800;
-            animation: pulse 2s infinite;
-        }
-
-        .live-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 35px rgba(239, 68, 68, 0.3);
-        }
-
-        .live-platform {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .live-platform-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            color: white;
-        }
-
-        .live-platform-icon.youtube {
-            background: linear-gradient(135deg, #FF0000, #CC0000);
-        }
-
-        .live-platform-icon.facebook {
-            background: linear-gradient(135deg, #1877F2, #0D5BBF);
-        }
-
-        .live-platform-name {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: white;
-        }
-
-        .live-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: white;
-            margin-bottom: 1rem;
-            line-height: 1.4;
-        }
-
-        .live-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.8rem;
-            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
-            color: white;
-            padding: 0.8rem 1.5rem;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
-        }
-
-        .live-link:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
-        }
-
-        /* Downloads Section */
-        .downloads-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 2rem;
-        }
-
-        .download-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 2rem;
-            transition: all 0.3s ease;
-            box-shadow: var(--glass-shadow);
-        }
-
-        .download-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 35px rgba(16, 185, 129, 0.3);
-            border-color: #10B981;
-        }
-
-        .download-icon {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, #10B981, #059669);
-            border-radius: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            color: white;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
-        }
-
-        .download-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 0.8rem;
-        }
-
-        .download-description {
-            color: rgba(255,255,255,0.8);
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
-        }
-
-        .download-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.8rem;
-            background: linear-gradient(135deg, #10B981, #059669);
-            color: white;
-            padding: 0.9rem 1.8rem;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
-        }
-
-        .download-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
-        }
-
-        /* Share Section */
-        .share-section {
-            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
-            border-radius: 24px;
-            padding: 4rem 3rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 12px 40px rgba(37, 99, 235, 0.4);
-        }
-
-        .share-section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(252, 211, 77, 0.1) 0%, transparent 70%);
-            animation: rotate 20s linear infinite;
-        }
-
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .share-content {
-            position: relative;
-            z-index: 1;
-        }
-
-        .share-title {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: white;
-            margin-bottom: 1rem;
-        }
-
-        .share-text {
-            color: rgba(255,255,255,0.95);
-            font-size: 1.2rem;
-            margin-bottom: 2.5rem;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .whatsapp-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 1rem;
-            background: #25D366;
-            color: white;
-            padding: 1.2rem 2.5rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
-        }
-
-        .whatsapp-btn:hover {
-            transform: scale(1.08);
-            box-shadow: 0 8px 30px rgba(37, 211, 102, 0.7);
-        }
-
-        .whatsapp-btn i {
-            font-size: 1.8rem;
-        }
-
-        /* Subscribe Section */
-        .subscribe-form {
-            max-width: 600px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .input-group {
-            position: relative;
-        }
-
-        .input-group i {
-            position: absolute;
-            left: 1.2rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--primary-blue);
-            font-size: 1.1rem;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 1.2rem 1.2rem 1.2rem 3.5rem;
-            border: 2px solid var(--glass-border);
-            border-radius: 14px;
-            background: rgba(255,255,255,0.95);
-            font-family: 'Poppins', sans-serif;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            color: #333;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
-        }
-
-        .subscribe-btn {
-            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
-            color: white;
-            padding: 1.2rem;
-            border: none;
-            border-radius: 14px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.8rem;
-        }
-
-        .subscribe-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.6);
-        }
-
-        .subscribe-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Footer */
-        footer {
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid var(--glass-border);
-            padding: 4rem 2rem 2rem;
-            margin-top: 4rem;
-        }
-
-        .footer-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 3rem;
-            margin-bottom: 3rem;
-        }
-
-        .footer-section h3 {
-            color: white;
-            font-size: 1.4rem;
-            margin-bottom: 1.5rem;
-            font-weight: 700;
-        }
-
-        .footer-section p,
-        .footer-section a {
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            line-height: 2;
-            transition: color 0.3s ease;
-            display: block;
-        }
-
-        .footer-section a:hover {
-            color: var(--primary-yellow);
-        }
-
-        .social-links {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .social-link {
-            width: 50px;
-            height: 50px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.4rem;
-            transition: all 0.3s ease;
-            text-decoration: none;
-        }
-
-        .social-link:hover {
-            background: var(--primary-yellow);
-            color: var(--dark-blue);
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(252, 211, 77, 0.4);
-        }
-
-        .footer-bottom {
-            text-align: center;
-            padding-top: 2rem;
-            border-top: 1px solid var(--glass-border);
-            color: rgba(255,255,255,0.7);
-        }
-
-        .footer-bottom strong {
-            color: var(--primary-yellow);
-            font-weight: 700;
-        }
-
-        /* Loading */
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 3rem;
-        }
-
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(255,255,255,0.2);
-            border-top-color: var(--primary-yellow);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 14px;
-            padding: 1.2rem 2rem;
-            color: white;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            transform: translateX(400px);
-            transition: transform 0.4s ease;
-            z-index: 2000;
-            font-weight: 500;
-        }
-
-        .toast.show {
-            transform: translateX(0);
-        }
-
-        .toast.success {
-            border-left: 4px solid #10B981;
-        }
-
-        .toast.error {
-            border-left: 4px solid #EF4444;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .mobile-menu-btn {
-                display: block;
-            }
-
-            .nav-links {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: rgba(15, 23, 42, 0.95);
-                backdrop-filter: blur(20px);
-                flex-direction: column;
-                padding: 1.5rem;
-                gap: 1rem;
-                border-top: 1px solid var(--glass-border);
-            }
-
-            .nav-links.active {
-                display: flex;
-            }
-
-            .site-title {
-                font-size: 1.6rem;
-            }
-
-            .logo-svg {
-                width: 70px;
-                height: 52px;
-            }
-
-            .hero h1 {
-                font-size: 2.2rem;
-            }
-
-            .hero p {
-                font-size: 1.1rem;
-            }
-
-            .section {
-                padding: 2rem 1.5rem;
-            }
-
-            .section-title {
-                font-size: 1.6rem;
-            }
-
-            .section-icon {
-                width: 55px;
-                height: 55px;
-                font-size: 1.5rem;
-            }
-
-            .ticker-label {
-                padding: 1rem;
-                font-size: 0.9rem;
-            }
-
-            .ticker-wrapper {
-                margin-left: 130px;
-            }
-
-            .news-grid,
-            .live-grid,
-            .downloads-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .share-title {
-                font-size: 1.8rem;
-            }
-
-            .container {
-                padding: 1rem;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#060B16">
+  <meta name="color-scheme" content="dark">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <title>LTcine TV - Actualités • Reportages • Évangélisation</title>
+  <meta name="description" content="LTcine TV : média digital chrétien dédié à la communication, à l'unité en Christ et à l'édification du corps de Christ.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --brand-blue: #2F6BFF;
+      --brand-blue-soft: #5E8EFF;
+      --brand-yellow: #F4CF5D;
+      --dark-navy: #050A15;
+      --deep-navy: #0A1224;
+      --panel-bg: rgba(10, 18, 36, 0.72);
+      --panel-bg-strong: rgba(8, 14, 28, 0.82);
+      --panel-border: rgba(140, 176, 255, 0.18);
+      --panel-shadow: 0 18px 46px rgba(0, 0, 0, 0.32);
+      --text-main: rgba(255, 255, 255, 0.96);
+      --text-soft: rgba(232, 239, 255, 0.82);
+      --text-muted: rgba(202, 214, 245, 0.66);
+      --success: #25D366;
+      --danger: #EF4444;
+      --header-height: 90px;
+      --glow-blue: 0 0 0 1px rgba(47,107,255,.18), 0 10px 30px rgba(47,107,255,.16), inset 0 1px 0 rgba(255,255,255,.06);
+      --glow-gold: 0 0 0 1px rgba(244,207,93,.16), 0 10px 24px rgba(244,207,93,.10), inset 0 1px 0 rgba(255,255,255,.08);
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: calc(var(--header-height) + 20px);
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+      background:
+        radial-gradient(circle at 16% 12%, rgba(47,107,255,.22), transparent 24rem),
+        radial-gradient(circle at 82% 18%, rgba(244,207,93,.10), transparent 26rem),
+        radial-gradient(circle at 20% 84%, rgba(47,107,255,.10), transparent 30rem),
+        linear-gradient(160deg, #03060E 0%, #081120 42%, #040A16 100%);
+      background-attachment: fixed;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        linear-gradient(115deg, rgba(255,255,255,.04), transparent 34%, transparent 66%, rgba(255,255,255,.03)),
+        repeating-linear-gradient(135deg, rgba(255,255,255,.015), rgba(255,255,255,.015) 2px, transparent 2px, transparent 28px);
+      mix-blend-mode: screen;
+      opacity: .55;
+    }
+
+    body.menu-open,
+    body.modal-open { overflow: hidden; }
+
+    img { display: block; max-width: 100%; }
+
+    button, input, a { -webkit-tap-highlight-color: transparent; }
+    button, input { font: inherit; }
+
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible {
+      outline: 3px solid rgba(244,207,93,.8);
+      outline-offset: 3px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* HEADER */
+    header {
+      min-height: var(--header-height);
+      position: sticky;
+      top: 0;
+      z-index: 1200;
+      background: rgba(4, 9, 18, 0.82);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(140,176,255,.14);
+      box-shadow: 0 12px 28px rgba(0,0,0,.20);
+    }
+
+    .header-content {
+      max-width: 1400px;
+      min-height: var(--header-height);
+      margin: 0 auto;
+      padding: 12px 24px;
+      display: grid;
+      grid-template-columns: auto minmax(260px, 620px) auto;
+      gap: 22px;
+      align-items: center;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: max-content;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .logo-badge {
+      width: 74px;
+      height: 74px;
+      border-radius: 18px;
+      padding: 0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.025)),
+        linear-gradient(145deg, #17233A, #0B1324);
+      border: 1px solid rgba(140,176,255,.18);
+      box-shadow:
+        0 12px 30px rgba(0,0,0,.24),
+        inset 0 1px 0 rgba(255,255,255,.08);
+      position: relative;
+      overflow: hidden;
+      flex: 0 0 auto;
+    }
+
+    .logo-badge::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(115deg, transparent 22%, rgba(255,255,255,.18) 50%, transparent 76%);
+      transform: translateX(-130%);
+      animation: glassSweep 6s linear infinite;
+      pointer-events: none;
+      z-index: 2;
+      opacity: .6;
+    }
+
+    .logo-image {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 155%;
+      height: 155%;
+      max-width: none;
+      object-fit: contain;
+      transform: translate(-50%, -50%);
+      filter: drop-shadow(0 3px 8px rgba(47,107,255,.18));
+      z-index: 1;
+    }
+
+    .site-title-wrap {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.06;
+    }
+
+    .site-title {
+      font-size: 1.82rem;
+      font-weight: 900;
+      letter-spacing: -.7px;
+      color: #fff;
+      text-shadow: 0 4px 18px rgba(47,107,255,.18);
+    }
+
+    .site-title .accent { color: var(--brand-yellow); }
+
+    .site-subtitle {
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-top: 5px;
+    }
+
+    .top-search {
+      position: relative;
+      width: 100%;
+    }
+
+    .top-search i {
+      position: absolute;
+      left: 17px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(230, 238, 255, 0.68);
+      pointer-events: none;
+    }
+
+    .top-search input {
+      width: 100%;
+      height: 49px;
+      padding: 0 48px 0 48px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.12);
+      color: #fff;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)),
+        rgba(8,14,28,.72);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+    .top-search input::placeholder { color: rgba(220,229,252,.54); }
+
+    .top-search input:focus {
+      outline: none;
+      border-color: rgba(244,207,93,.58);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03)),
+        rgba(8,14,28,.84);
+      box-shadow: 0 0 0 4px rgba(244,207,93,.08), inset 0 1px 0 rgba(255,255,255,.07);
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 0;
+      color: rgba(255,255,255,.72);
+      background: transparent;
+      display: none;
+      cursor: pointer;
+    }
+
+    .search-clear.visible { display: inline-grid; place-items: center; }
+    .search-clear:hover { background: rgba(255,255,255,.09); }
+
+    .menu-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.12);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03)),
+        rgba(8,14,28,.74);
+      color: #fff;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 1.2rem;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+      transition: transform .2s ease, background .2s ease;
+    }
+
+    .menu-btn:hover {
+      transform: translateY(-1px);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04)),
+        rgba(8,14,28,.84);
+    }
+
+    /* SIDE MENU */
+    .menu-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 1990;
+      background: rgba(2,6,12,.65);
+      backdrop-filter: blur(5px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .25s ease, visibility .25s ease;
+    }
+
+    .menu-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .side-menu {
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 2000;
+      width: min(390px, 90vw);
+      height: 100dvh;
+      padding: 22px;
+      overflow-y: auto;
+      border-left: 1px solid rgba(255,255,255,.10);
+      transform: translateX(105%);
+      transition: transform .30s cubic-bezier(.22,.8,.22,1);
+      background:
+        linear-gradient(180deg, rgba(11,19,36,.96), rgba(6,12,24,.98));
+      box-shadow: -34px 0 70px rgba(0,0,0,.36);
+    }
+
+    .side-menu.active { transform: translateX(0); }
+
+    .side-menu-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    .side-menu-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+    }
+
+    .menu-close {
+      width: 42px;
+      height: 42px;
+      border: 0;
+      border-radius: 12px;
+      color: #fff;
+      background: rgba(255,255,255,.08);
+      cursor: pointer;
+    }
+
+    .menu-nav {
+      display: grid;
+      gap: 8px;
+      margin: 20px 0 28px;
+    }
+
+    .menu-nav a {
+      color: rgba(255,255,255,.92);
+      text-decoration: none;
+      padding: 13px 14px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: background .2s ease, color .2s ease, transform .2s ease;
+    }
+
+    .menu-nav a:hover {
+      background: rgba(255,255,255,.07);
+      color: var(--brand-yellow);
+      transform: translateX(3px);
+    }
+
+    .menu-section-title {
+      color: var(--brand-yellow);
+      font-size: .84rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .category-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .category-btn {
+      padding: 11px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      cursor: pointer;
+      color: rgba(255,255,255,.88);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015)),
+        rgba(10,18,36,.8);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-align: left;
+      transition: .2s ease;
+    }
+
+    .category-btn:hover,
+    .category-btn.active {
+      background:
+        linear-gradient(180deg, rgba(47,107,255,.28), rgba(47,107,255,.12)),
+        rgba(10,18,36,.9);
+      border-color: rgba(94,142,255,.38);
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(47,107,255,.14);
+    }
+
+    /* TICKER */
+    .ticker-container {
+      height: 52px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(47,107,255,.95), rgba(25,54,132,.95));
+      border-top: 1px solid rgba(255,255,255,.06);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 10px 22px rgba(47,107,255,.16);
+    }
+
+    .ticker-label {
+      align-self: stretch;
+      min-width: 118px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      background: var(--brand-yellow);
+      color: #142750;
+      font-weight: 900;
+      box-shadow: 8px 0 18px rgba(0,0,0,.15);
+      z-index: 2;
+    }
+
+    .ticker-label i { animation: pulse 1.5s infinite; }
+
+    .ticker-wrapper {
+      min-width: 0;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .ticker-content {
+      width: max-content;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      animation: ticker 18s linear infinite;
+      will-change: transform;
+    }
+
+    .ticker-container:hover .ticker-content { animation-play-state: paused; }
+
+    .ticker-item {
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+      font-weight: 600;
+      font-size: .98rem;
+      letter-spacing: .01em;
+    }
+
+    .ticker-item::before {
+      content: "●";
+      color: var(--brand-yellow);
+      font-size: .6rem;
+    }
+
+    /* HERO */
+    .hero {
+      padding: clamp(3.3rem, 8vw, 6.2rem) 1.2rem 3.8rem;
+      position: relative;
+    }
+
+    .hero-content {
+      max-width: 1040px;
+      margin: 0 auto;
+      text-align: center;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025)),
+        rgba(7,12,23,.54);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 30px;
+      padding: clamp(2rem,5vw,3.6rem) clamp(1.4rem,4vw,3rem);
+      box-shadow: var(--panel-shadow), inset 0 1px 0 rgba(255,255,255,.06);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-content::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 10% 18%, rgba(47,107,255,.14), transparent 25%),
+        radial-gradient(circle at 85% 20%, rgba(244,207,93,.10), transparent 20%);
+      pointer-events: none;
+    }
+
+
+    .hero-badge {
+      width: fit-content;
+      margin: 0 auto 16px;
+      padding: 8px 15px;
+      border-radius: 999px;
+      border: 1px solid rgba(244,207,93,.28);
+      background: rgba(244,207,93,.08);
+      color: #F7DE88;
+      font-size: .88rem;
+      font-weight: 700;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero h1 {
+      position: relative;
+      z-index: 1;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.3rem, 6vw, 4.8rem);
+      line-height: 1.04;
+      font-weight: 900;
+      letter-spacing: -.03em;
+      margin-bottom: 1.2rem;
+      color: #fff;
+      text-shadow: 0 10px 26px rgba(0,0,0,.28);
+    }
+
+    .hero p {
+      position: relative;
+      z-index: 1;
+      max-width: 790px;
+      margin: 0 auto;
+      font-size: clamp(1rem, 2vw, 1.18rem);
+      color: rgba(243, 246, 255, 0.88);
+      text-shadow: 0 2px 10px rgba(0,0,0,.22);
+    }
+
+
+    .hero-services {
+      position: relative;
+      z-index: 1;
+      margin: 1.7rem auto 0;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .hero-services span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: rgba(245,248,255,.90);
+      font-size: .9rem;
+      font-weight: 650;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025)),
+        rgba(7,13,26,.52);
+      border: 1px solid rgba(255,255,255,.09);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+    }
+
+    .hero-services i {
+      color: var(--brand-yellow);
+    }
+
+
+
+
+    .hero-compact {
+      padding: 1.7rem 1.2rem .8rem;
+    }
+
+    .hero-content-compact {
+      padding: 1.35rem 1.4rem;
+      border-radius: 22px;
+    }
+
+    .hero-content-compact h1 {
+      font-size: clamp(1.65rem, 4.6vw, 2.8rem);
+      margin-bottom: .75rem;
+    }
+
+    .hero-content-compact p {
+      font-size: clamp(.94rem, 2vw, 1.05rem);
+    }
+
+    /* MAIN */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.25rem 2rem 2rem;
+    }
+
+    .section {
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025)),
+        var(--panel-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--panel-border);
+      border-radius: 24px;
+      padding: clamp(1.4rem, 4vw, 3rem);
+      margin-bottom: 2.4rem;
+      box-shadow: var(--panel-shadow), inset 0 1px 0 rgba(255,255,255,.06);
+      position: relative;
+      overflow: hidden;
+      content-visibility: auto;
+      contain-intrinsic-size: 500px;
+    }
+
+    .section::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--brand-blue), var(--brand-yellow));
+    }
+
+    .section::after {
+      content: "";
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      right: -180px;
+      top: -160px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(47,107,255,.08), transparent 68%);
+      pointer-events: none;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      margin-bottom: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-icon {
+      width: 64px;
+      height: 64px;
+      flex: 0 0 auto;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      font-size: 1.65rem;
+      color: #fff;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.04)),
+        linear-gradient(135deg, var(--brand-blue), #173A9D);
+      box-shadow: 0 10px 24px rgba(47,107,255,.22), inset 0 1px 0 rgba(255,255,255,.10);
+    }
+
+    .section-title {
+      font-size: clamp(1.5rem, 3vw, 2.15rem);
+      font-weight: 850;
+      line-height: 1.14;
+      color: #fff;
+      text-shadow: 0 4px 14px rgba(0,0,0,.20);
+    }
+
+    .section-subtitle {
+      font-size: .95rem;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
+
+    .section-toolbar {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .result-count {
+      font-size: .88rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .empty-state,
+    .error-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-soft);
+    }
+
+    .error-state { color: #ffb2b2; }
+
+    .verse-content {
+      padding: clamp(1.3rem, 3vw, 2rem);
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)),
+        rgba(244,207,93,.045);
+      border: 1px solid rgba(244,207,93,.14);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      position: relative;
+      z-index: 1;
+    }
+
+    .verse-text {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      line-height: 1.85;
+      font-size: clamp(1.05rem, 2vw, 1.35rem);
+      margin-bottom: 1rem;
+      color: rgba(255,255,255,.96);
+    }
+
+    .verse-reference {
+      text-align: right;
+      color: var(--brand-yellow);
+      font-weight: 750;
+    }
+
+    /* NEWS */
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.55rem;
+      min-height: 160px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .news-card {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      border-radius: 20px;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.02)),
+        rgba(8,14,28,.74);
+      border: 1px solid rgba(255,255,255,.09);
+      box-shadow: 0 12px 30px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.04);
+      transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+    }
+
+    .news-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(94,142,255,.36);
+      box-shadow: 0 20px 42px rgba(0,0,0,.28), 0 8px 22px rgba(47,107,255,.10);
+    }
+
+    .news-image {
+      height: 205px;
+      position: relative;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 70% 20%, rgba(255,255,255,.20), transparent 28%),
+        linear-gradient(135deg, rgba(47,107,255,.95), #173A9D);
+    }
+
+    .news-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .news-image > i {
+      font-size: 3.7rem;
+      color: rgba(255,255,255,.94);
+      filter: drop-shadow(0 5px 14px rgba(0,0,0,.18));
+    }
+
+    .news-content {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      padding: 1.45rem;
+    }
+
+    .news-date {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: #F6DA83;
+      font-size: .84rem;
+      font-weight: 650;
+      margin-bottom: .72rem;
+    }
+
+    .news-title {
+      font-size: 1.18rem;
+      line-height: 1.38;
+      font-weight: 760;
+      margin-bottom: .84rem;
+      overflow-wrap: anywhere;
+      color: #fff;
+    }
+
+    .news-excerpt {
+      color: rgba(236, 241, 255, 0.82);
+      line-height: 1.75;
+      font-size: .92rem;
+      margin-bottom: 1.25rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .news-read-more {
+      margin-top: auto;
+      align-self: flex-start;
+      border: 0;
+      background: transparent;
+      color: var(--brand-yellow);
+      font-weight: 750;
+      cursor: pointer;
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 4px 0;
+    }
+
+    /* LIVE */
+    .live-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 1.45rem;
+      min-height: 140px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .live-card {
+      position: relative;
+      border-radius: 20px;
+      padding: 1.55rem;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.02)),
+        rgba(8,14,28,.76);
+      border: 1px solid rgba(255,255,255,.09);
+      box-shadow: 0 12px 30px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.04);
+      transition: transform .22s ease, border-color .22s ease;
+    }
+
+    .live-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(239,68,68,.35);
+    }
+
+    .live-badge {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: .69rem;
+      letter-spacing: .06em;
+      font-weight: 900;
+      background: var(--danger);
+    }
+
+    .live-platform {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 1.2rem;
+      padding-right: 58px;
+    }
+
+    .live-platform-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-size: 1.55rem;
+      color: #fff;
+    }
+
+    .live-platform-icon.youtube { background: #E11D48; }
+    .live-platform-icon.facebook { background: #1877F2; }
+
+    .live-platform-name {
+      font-size: 1.08rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .live-title {
+      font-size: 1.08rem;
+      line-height: 1.48;
+      margin-bottom: 1.2rem;
+      color: #fff;
+    }
+
+    .live-link,
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 740;
+      padding: 10px 15px;
+      border-radius: 12px;
+      transition: transform .2s ease, filter .2s ease;
+    }
+
+    .live-link {
+      background: linear-gradient(135deg, var(--brand-blue), #173A9D);
+      box-shadow: 0 10px 22px rgba(47,107,255,.18);
+    }
+
+    .live-link:hover,
+    .download-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+    }
+
+
+    .media-intro {
+      position: relative;
+      z-index: 1;
+      margin: -0.2rem 0 1.6rem;
+      padding: 1.35rem;
+      border-radius: 18px;
+      display: grid;
+      grid-template-columns: minmax(0,1.35fr) minmax(260px,.65fr);
+      gap: 1rem;
+      align-items: center;
+      background:
+        linear-gradient(135deg, rgba(47,107,255,.10), rgba(244,207,93,.04)),
+        rgba(7,13,27,.54);
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    .media-kicker {
+      display: inline-block;
+      margin-bottom: 5px;
+      color: var(--brand-yellow);
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .media-intro h3 {
+      color: #fff;
+      font-size: clamp(1.15rem,2.6vw,1.55rem);
+      line-height: 1.35;
+      margin-bottom: 6px;
+    }
+
+    .media-intro p {
+      color: var(--text-soft);
+      font-size: .92rem;
+      line-height: 1.7;
+    }
+
+    .media-capabilities {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .media-capabilities span {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 10px;
+      border-radius: 12px;
+      color: rgba(247,249,255,.88);
+      font-size: .82rem;
+      font-weight: 650;
+      background: rgba(255,255,255,.045);
+      border: 1px solid rgba(255,255,255,.07);
+    }
+
+    .media-capabilities i {
+      color: var(--brand-blue-soft);
+    }
+
+    /* DOWNLOADS */
+    .downloads-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 1.45rem;
+      min-height: 140px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .download-card {
+      border-radius: 20px;
+      padding: 1.55rem;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.02)),
+        rgba(8,14,28,.76);
+      border: 1px solid rgba(255,255,255,.09);
+      box-shadow: 0 12px 30px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.04);
+      transition: transform .22s ease, border-color .22s ease;
+    }
+
+    .download-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(37,211,102,.35);
+    }
+
+    .download-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      font-size: 1.55rem;
+      margin-bottom: 1.1rem;
+      color: #fff;
+      background: linear-gradient(135deg, var(--brand-blue), #1D4ED8);
+      box-shadow: 0 10px 24px rgba(47,107,255,.20);
+    }
+
+    .download-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: .65rem;
+      overflow-wrap: anywhere;
+      color: #fff;
+    }
+
+    .download-description {
+      color: var(--text-soft);
+      font-size: .92rem;
+      line-height: 1.7;
+      margin-bottom: 1.15rem;
+    }
+
+    .download-btn {
+      background: linear-gradient(135deg, var(--brand-blue), #1D4ED8);
+      box-shadow: 0 10px 24px rgba(47,107,255,.20);
+    }
+
+
+    .about-content {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0,1.15fr) minmax(300px,.85fr);
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    .about-main {
+      padding: 1.5rem;
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.02)),
+        rgba(7,13,27,.54);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .about-kicker {
+      display: inline-block;
+      margin-bottom: 7px;
+      color: var(--brand-yellow);
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+
+    .about-main h3 {
+      font-size: clamp(1.25rem,3vw,1.75rem);
+      line-height: 1.4;
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+
+    .about-main p {
+      color: var(--text-soft);
+      line-height: 1.8;
+      margin-bottom: .9rem;
+    }
+
+    .about-main p:last-child {
+      margin-bottom: 0;
+    }
+
+    .about-pillars {
+      display: grid;
+      gap: .85rem;
+    }
+
+    .about-pillars article {
+      display: grid;
+      grid-template-columns: 46px minmax(0,1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 1rem;
+      border-radius: 16px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.018)),
+        rgba(7,13,27,.48);
+      border: 1px solid rgba(255,255,255,.07);
+    }
+
+    .about-pillars article > i {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      color: var(--brand-yellow);
+      background: rgba(47,107,255,.12);
+      border: 1px solid rgba(94,142,255,.14);
+    }
+
+    .about-pillars h4 {
+      color: #fff;
+      margin-bottom: 4px;
+      font-size: .98rem;
+    }
+
+    .about-pillars p {
+      color: var(--text-muted);
+      font-size: .86rem;
+      line-height: 1.6;
+    }
+
+    /* SHARE / WHATSAPP */
+    .share-section {
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 2.4rem;
+      border-radius: 28px;
+      padding: clamp(2.4rem, 6vw, 4rem) clamp(1.3rem, 5vw, 3rem);
+      background:
+        linear-gradient(145deg, rgba(5,11,24,.92), rgba(14,22,40,.92) 58%, rgba(9,16,32,.94)),
+        radial-gradient(circle at 14% 22%, rgba(47,107,255,.12), transparent 26%),
+        radial-gradient(circle at 86% 16%, rgba(244,207,93,.08), transparent 18%);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: var(--panel-shadow), inset 0 1px 0 rgba(255,255,255,.06);
+    }
+
+    .share-section::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(110deg, transparent 15%, rgba(255,255,255,.06) 49%, transparent 80%);
+      opacity: .6;
+    }
+
+    .share-content {
+      position: relative;
+      z-index: 1;
+      max-width: 760px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .share-title {
+      font-size: clamp(1.8rem, 4vw, 2.55rem);
+      font-weight: 860;
+      margin-bottom: .9rem;
+      color: #fff;
+      text-shadow: 0 8px 20px rgba(0,0,0,.26);
+    }
+
+    .share-text {
+      max-width: 620px;
+      margin: 0 auto 2rem;
+      color: rgba(242,246,255,.85);
+      font-size: 1.03rem;
+      text-shadow: 0 2px 10px rgba(0,0,0,.16);
+    }
+
+    .whatsapp-card {
+      width: min(560px, 100%);
+      margin: 0 auto;
+      padding: 16px;
+      border-radius: 24px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.03)),
+        rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 16px 36px rgba(0,0,0,.26);
+    }
+
+    .whatsapp-btn {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      min-height: 74px;
+      width: 100%;
+      padding: 12px 18px;
+      border-radius: 22px;
+      text-decoration: none;
+      color: #fff;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04)),
+        linear-gradient(135deg, rgba(37,211,102,.32), rgba(37,211,102,.12)),
+        rgba(6,14,26,.72);
+      border: 1px solid rgba(255,255,255,.12);
+      overflow: hidden;
+      box-shadow: 0 14px 32px rgba(20, 40, 28, 0.28), inset 0 1px 0 rgba(255,255,255,.09);
+      isolation: isolate;
+    }
+
+    .whatsapp-btn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      padding: 2px;
+      border-radius: inherit;
+      background: linear-gradient(120deg, rgba(37,211,102,.18), rgba(255,255,255,.86), rgba(37,211,102,.18));
+      -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      animation: borderFlow 2.7s linear infinite;
+      pointer-events: none;
+    }
+
+    .whatsapp-btn::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.18) 50%, transparent 70%);
+      transform: translateX(-120%);
+      animation: glassSweep 4.8s linear infinite;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .whatsapp-icon-wrap {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #25D366, #0FA958);
+      box-shadow: 0 0 0 7px rgba(37,211,102,.10), 0 10px 24px rgba(37,211,102,.24);
+      animation: whatsappPulse 1.85s ease-in-out infinite;
+      flex: 0 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .whatsapp-icon-wrap i {
+      font-size: 1.7rem;
+      color: #fff;
+    }
+
+    .whatsapp-text {
+      text-align: left;
+      position: relative;
+      z-index: 1;
+    }
+
+    .whatsapp-label {
+      display: block;
+      font-size: .82rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: rgba(223,248,234,.74);
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .whatsapp-number {
+      display: block;
+      font-size: 1.2rem;
+      font-weight: 850;
+      color: #fff;
+      letter-spacing: .01em;
+    }
+
+    /* SUBSCRIBE */
+    .subscribe-form {
+      max-width: 620px;
+      margin: 0 auto;
+      display: grid;
+      gap: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .input-group { position: relative; }
+
+    .input-group i {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--brand-blue);
+      pointer-events: none;
+    }
+
+    .input-group input {
+      width: 100%;
+      height: 52px;
+      padding: 0 16px 0 46px;
+      border-radius: 13px;
+      border: 1px solid rgba(255,255,255,.10);
+      color: #fff;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)),
+        rgba(8,14,28,.82);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      transition: .2s ease;
+    }
+
+    .input-group input::placeholder { color: rgba(220,229,252,.50); }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: rgba(47,107,255,.45);
+      box-shadow: 0 0 0 4px rgba(47,107,255,.08), inset 0 1px 0 rgba(255,255,255,.06);
+    }
+
+    .subscribe-btn {
+      min-height: 52px;
+      border: 0;
+      border-radius: 13px;
+      cursor: pointer;
+      color: #fff;
+      font-weight: 820;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      background: linear-gradient(135deg, var(--brand-blue), #173A9D);
+      box-shadow: 0 12px 26px rgba(47,107,255,.20);
+      transition: transform .2s ease, opacity .2s ease;
+    }
+
+    .subscribe-btn:hover { transform: translateY(-2px); }
+    .subscribe-btn:disabled { opacity: .58; cursor: not-allowed; transform: none; }
+
+    /* SKELETON */
+    .skeleton-grid {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
+      gap: 1.3rem;
+      width: 100%;
+    }
+
+    .skeleton-card {
+      min-height: 260px;
+      border-radius: 18px;
+      background:
+        linear-gradient(100deg,
+          rgba(255,255,255,.05) 20%,
+          rgba(255,255,255,.10) 38%,
+          rgba(255,255,255,.05) 56%);
+      background-size: 200% 100%;
+      animation: skeleton 1.25s linear infinite;
+    }
+
+    /* FOOTER */
+    footer {
+      background: rgba(4,9,18,.90);
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding: 3.2rem 2rem 1.6rem;
+      margin-top: 2rem;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .footer-content {
+      max-width: 1400px;
+      margin: 0 auto 2.5rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
+      gap: 2.6rem;
+    }
+
+    .footer-section h3 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+
+    .footer-section p,
+    .footer-section a {
+      color: rgba(228,236,255,.74);
+      text-decoration: none;
+      line-height: 1.9;
+    }
+
+    .footer-section a:hover { color: var(--brand-yellow); }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+      margin-top: 1.2rem;
+    }
+
+    .social-link {
+      width: 44px;
+      height: 44px;
+      border-radius: 13px;
+      display: grid !important;
+      place-items: center;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03)),
+        rgba(255,255,255,.02);
+      color: #fff !important;
+      transition: transform .2s ease, background .2s ease;
+    }
+
+    .social-link:hover {
+      transform: translateY(-3px);
+      background:
+        linear-gradient(180deg, rgba(244,207,93,.14), rgba(244,207,93,.08)),
+        rgba(255,255,255,.02);
+    }
+
+    .footer-bottom {
+      max-width: 1400px;
+      margin: 0 auto;
+      text-align: center;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,.08);
+      color: rgba(255,255,255,.58);
+      font-size: .9rem;
+    }
+
+    .footer-bottom strong { color: var(--brand-yellow); }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 4000;
+      max-width: min(390px, calc(100vw - 40px));
+      padding: 13px 17px;
+      border-radius: 13px;
+      background: rgba(5,10,20,.97);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 18px 42px rgba(0,0,0,.36);
+      color: #fff;
+      transform: translateY(28px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .25s ease, transform .25s ease, visibility .25s ease;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .toast.success { border-left: 4px solid var(--success); }
+    .toast.error { border-left: 4px solid var(--danger); }
+
+    /* MODAL */
+    .article-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 3500;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      background: rgba(2,6,12,.82);
+      backdrop-filter: blur(10px);
+    }
+
+    .article-dialog {
+      width: min(900px, 100%);
+      max-height: 90dvh;
+      overflow: auto;
+      border-radius: 24px;
+      position: relative;
+      padding: clamp(1.4rem,4vw,2.8rem);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025)),
+        rgba(8,14,28,.94);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 30px 80px rgba(0,0,0,.46), inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    .article-close {
+      position: sticky;
+      float: right;
+      top: 0;
+      width: 42px;
+      height: 42px;
+      border: 0;
+      border-radius: 50%;
+      color: #fff;
+      background: rgba(255,255,255,.10);
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .article-modal-title {
+      font-size: clamp(1.55rem, 4vw, 2.25rem);
+      line-height: 1.23;
+      padding-right: 52px;
+      margin-bottom: .8rem;
+      overflow-wrap: anywhere;
+      color: #fff;
+    }
+
+    .article-meta {
+      color: #F6DA83;
+      font-size: .9rem;
+      margin-bottom: 1.7rem;
+    }
+
+    .article-body {
+      color: rgba(239,244,255,.90);
+      line-height: 1.85;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    /* ANIMATIONS */
+    @keyframes ticker {
+      from { transform: translate3d(0,0,0); }
+      to   { transform: translate3d(-50%,0,0); }
+    }
+
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .58; transform: scale(.92); }
+    }
+
+    @keyframes skeleton {
+      to { background-position-x: -200%; }
+    }
+
+    @keyframes glassSweep {
+      to { transform: translateX(130%); }
+    }
+
+    @keyframes borderFlow {
+      0%   { filter: hue-rotate(0deg); opacity: .92; }
+      50%  { opacity: 1; }
+      100% { filter: hue-rotate(18deg); opacity: .92; }
+    }
+
+    @keyframes whatsappPulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 7px rgba(37,211,102,.10), 0 10px 24px rgba(37,211,102,.24);
+      }
+      50% {
+        transform: scale(1.06);
+        box-shadow: 0 0 0 12px rgba(37,211,102,.08), 0 14px 30px rgba(37,211,102,.28);
+      }
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .header-content {
+        grid-template-columns: auto auto;
+        gap: 10px 14px;
+        padding: 10px 16px 12px;
+      }
+
+      .logo-badge {
+        width: 68px;
+        height: 68px;
+        border-radius: 17px;
+      }
+
+      .site-title { font-size: 1.48rem; }
+      .site-subtitle { font-size: .72rem; }
+
+      .top-search {
+        grid-column: 1 / -1;
+        grid-row: 2;
+      }
+
+      :root { --header-height: 136px; }
+
+      .hero { padding-top: 3.4rem; }
+    }
+
+    @media (max-width: 600px) {
+      .menu-btn { width: 46px; height: 46px; }
+      .ticker-container { height: 48px; }
+      .ticker-label { min-width: 92px; font-size: .84rem; }
+      .ticker-item { padding: 0 24px; font-size: .9rem; }
+      .ticker-content { animation-duration: 14s; }
+
+      .container { padding: 1rem; }
+      .section { margin-bottom: 1.35rem; border-radius: 20px; }
+      .section-header { align-items: flex-start; gap: 1rem; }
+      .section-icon { width: 52px; height: 52px; border-radius: 15px; font-size: 1.4rem; }
+      .section-toolbar { display: none; }
+
+      .news-grid, .live-grid, .downloads-grid { grid-template-columns: 1fr; }
+      .media-intro { grid-template-columns: 1fr; }
+      .about-content { grid-template-columns: 1fr; }
+      .media-capabilities { grid-template-columns: 1fr 1fr; }
+      .news-image { height: 190px; }
+      .category-list { grid-template-columns: 1fr; }
+      .hero-content { border-radius: 24px; }
+      .hero-logo-glass { border-radius: 22px; }
+      .share-section { border-radius: 22px; }
+
+      .whatsapp-btn {
+        min-height: 82px;
+        justify-content: flex-start;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .whatsapp-number { font-size: 1.08rem; }
+
+      footer { padding-left: 1rem; padding-right: 1rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+      }
+
+      .ticker-content { animation: none !important; }
+    }
+  </style>
 </head>
 <body>
-    <div class="bg-animation"></div>
+  <header>
+    <div class="header-content">
+      <a href="#accueil" class="logo-container" aria-label="LTcine TV - Accueil">
+        <div class="logo-badge">
+          <img
+            class="logo-image"
+            src="https://i.ibb.co/Q7NBvsD7/LT-20260319-205453-0000.png"
+            alt="Logo LTcine TV"
+            loading="eager"
+            decoding="async"
+            referrerpolicy="no-referrer"
+          >
+        </div>
+        <div class="site-title-wrap">
+          <span class="site-title">LTcine <span class="accent">TV</span></span>
+          <span class="site-subtitle">Actualités • Reportages • Évangélisation</span>
+        </div>
+      </a>
 
-    <!-- Header -->
-    <header>
-        <div class="header-content">
-            <div class="logo-container">
-                <svg class="logo-svg" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
-                    <!-- TV Antenna Left -->
-                    <line x1="60" y1="60" x2="40" y2="25" stroke="#2563EB" stroke-width="4" stroke-linecap="round"/>
-                    <circle cx="40" cy="25" r="6" fill="#2563EB"/>
-                    
-                    <!-- TV Antenna Right -->
-                    <line x1="90" y1="60" x2="110" y2="25" stroke="#2563EB" stroke-width="4" stroke-linecap="round"/>
-                    <circle cx="110" cy="25" r="6" fill="#2563EB"/>
-                    
-                    <!-- TV Body -->
-                    <path d="M 30 70 Q 30 60 40 60 L 120 60 Q 130 60 130 70 L 130 120 Q 130 130 120 130 L 40 130 Q 30 130 30 120 Z" 
-                          fill="#2563EB" opacity="0.95"/>
-                    
-                    <!-- LT Text -->
-                    <text x="38" y="110" font-family="Poppins" font-weight="900" font-size="45" fill="#2563EB">LT</text>
-                    
-                    <!-- cine Text -->
-                    <text x="95" y="110" font-family="Poppins" font-weight="400" font-size="32" fill="#2563EB">cine</text>
-                    
-                    <!-- TV Badge -->
-                    <rect x="135" y="75" width="55" height="45" rx="10" fill="#2563EB"/>
-                    <text x="142" y="107" font-family="Poppins" font-weight="800" font-size="28" fill="#FCD34D">TV</text>
-                </svg>
-                <h1 class="site-title">LTcine <span>TV</span></h1>
-            </div>
-            
-            <button class="mobile-menu-btn" onclick="toggleMenu()">
-                <i class="fas fa-bars"></i>
-            </button>
-            
-            <ul class="nav-links" id="navLinks">
-                <li><a href="#accueil">Accueil</a></li>
-                <li><a href="#verset">Verset</a></li>
-                <li><a href="#actualites">Actualités</a></li>
-                <li><a href="#direct">Direct</a></li>
-                <li><a href="#fichiers">Fichiers</a></li>
-                <li><a href="#partage">Partager</a></li>
-            </ul>
-        </div>
-    </header>
+      <div class="top-search" role="search">
+        <label class="sr-only" for="globalSearch">Rechercher une actualité</label>
+        <i class="fas fa-search" aria-hidden="true"></i>
+        <input id="globalSearch" type="search" autocomplete="off"
+               placeholder="Rechercher une actualité, un reportage, un sujet…"
+               maxlength="80">
+        <button class="search-clear" id="searchClear" type="button" aria-label="Effacer la recherche">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
 
-    <!-- Breaking News Ticker -->
-    <div class="ticker-container">
-        <div class="ticker-label">
-            <i class="fas fa-bolt"></i>
-            INFO
-        </div>
-        <div class="ticker-wrapper">
-            <div class="ticker-content" id="tickerContent">
-                <div class="ticker-item">Bienvenue sur LTcine TV - Votre source d'information fiable</div>
-                <div class="ticker-item">Actualités • Reportages • Publicités • Débats • Micro-trottoirs • Évangélisation • Mariage</div>
-            </div>
-        </div>
+      <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="sideMenu" aria-label="Ouvrir le menu">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="menu-backdrop" id="menuBackdrop"></div>
+  <aside class="side-menu" id="sideMenu" aria-hidden="true">
+    <div class="side-menu-header">
+      <div>
+        <div class="side-menu-title">Menu LTcine TV</div>
+        <div style="color:rgba(255,255,255,.55);font-size:.82rem;">Navigation & catégories</div>
+      </div>
+      <button class="menu-close" id="menuClose" type="button" aria-label="Fermer le menu">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
 
-    <!-- Hero Section -->
-    <section class="hero" id="accueil">
-        <div class="hero-content">
-            <h1>Votre Fenêtre sur l'Information</h1>
-            <p>LTcine TV vous apporte les dernières nouvelles, reportages et contenus de qualité pour vous informer et vous inspirer au quotidien.</p>
-            <div class="objectives">
-                <div class="objective-tag"><i class="fas fa-newspaper"></i> Actualités</div>
-                <div class="objective-tag"><i class="fas fa-video"></i> Reportages</div>
-                <div class="objective-tag"><i class="fas fa-bullhorn"></i> Publicités</div>
-                <div class="objective-tag"><i class="fas fa-comments"></i> Débats</div>
-                <div class="objective-tag"><i class="fas fa-microphone"></i> Micro-trottoirs</div>
-                <div class="objective-tag"><i class="fas fa-cross"></i> Évangélisation</div>
-                <div class="objective-tag"><i class="fas fa-heart"></i> Mariage</div>
-            </div>
+    <nav class="menu-nav" aria-label="Navigation principale">
+      <a href="#accueil"><i class="fas fa-house"></i> Accueil</a>
+      <a href="#verset"><i class="fas fa-book-bible"></i> Verset du Jour</a>
+      <a href="#actualites"><i class="fas fa-newspaper"></i> Actualités</a>
+      <a href="#direct"><i class="fas fa-tower-broadcast"></i> Direct</a>
+      <a href="#fichiers"><i class="fas fa-images"></i> Prestations & Galeries</a>
+      <a href="#a-propos"><i class="fas fa-circle-info"></i> À propos</a>
+      <a href="#partage"><i class="fas fa-share-nodes"></i> Partager une information</a>
+    </nav>
+
+    <div>
+      <div class="menu-section-title">Catégories</div>
+      <div class="category-list" id="categoryList">
+        <button class="category-btn active" data-category="all"><i class="fas fa-layer-group"></i> Tout afficher</button>
+        <button class="category-btn" data-category="actualites"><i class="fas fa-newspaper"></i> Actualités</button>
+        <button class="category-btn" data-category="reportages"><i class="fas fa-video"></i> Reportages</button>
+        <button class="category-btn" data-category="publicites"><i class="fas fa-bullhorn"></i> Publicités</button>
+        <button class="category-btn" data-category="debats"><i class="fas fa-comments"></i> Débats</button>
+        <button class="category-btn" data-category="micro-trottoirs"><i class="fas fa-microphone"></i> Micro-trottoirs</button>
+        <button class="category-btn" data-category="evangelisation"><i class="fas fa-cross"></i> Évangélisation</button>
+        <button class="category-btn" data-category="mariage"><i class="fas fa-heart"></i> Mariage</button>
+        <button class="category-btn" data-category="message"><i class="fas fa-message"></i> Message</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="ticker-container" aria-label="Bandeau d'information">
+    <div class="ticker-label">
+      <i class="fas fa-bolt"></i>
+      INFO
+    </div>
+    <div class="ticker-wrapper">
+      <div class="ticker-content" id="tickerContent"></div>
+    </div>
+  </div>
+
+  <section class="hero hero-compact" id="accueil">
+    <div class="hero-content hero-content-compact">
+      <div class="hero-badge"><i class="fas fa-circle" style="font-size:.48rem;"></i> LTcine TV</div>
+      <h1>L'information, les messages et vos événements en un seul espace</h1>
+      <p>
+        Actualités, reportages, messages, photos, vidéos et galeries de prestations.
+      </p>
+    </div>
+  </section>
+
+  <main class="container">
+
+
+    <section class="section" id="verset">
+      <div class="section-header">
+        <div class="section-icon"><i class="fas fa-book-bible"></i></div>
+        <div>
+          <h2 class="section-title">Verset du Jour</h2>
+          <p class="section-subtitle">La parole qui inspire et guide</p>
         </div>
+      </div>
+      <div id="verseContent">
+        <div class="verse-content">
+          <p class="verse-text">Chargement du verset…</p>
+        </div>
+      </div>
     </section>
 
-    <!-- Main Content -->
-    <div class="container">
-        <!-- Verse of the Day -->
-        <section class="section" id="verset">
-            <div class="section-header">
-                <div class="section-icon">
-                    <i class="fas fa-book-bible"></i>
-                </div>
-                <div>
-                    <h2 class="section-title">Verset du Jour</h2>
-                    <p class="section-subtitle">La parole qui inspire et guide</p>
-                </div>
-            </div>
-            <div id="verseContent">
-                <div class="loading">
-                    <div class="spinner"></div>
-                </div>
-            </div>
-        </section>
 
-        <!-- News Section -->
-        <section class="section" id="actualites">
-            <div class="section-header">
-                <div class="section-icon">
-                    <i class="fas fa-newspaper"></i>
-                </div>
-                <div>
-                    <h2 class="section-title">Informations du Jour</h2>
-                    <p class="section-subtitle">Les dernières actualités et reportages</p>
-                </div>
-            </div>
-            <div class="news-grid" id="newsGrid">
-                <div class="loading">
-                    <div class="spinner"></div>
-                </div>
-            </div>
-        </section>
+    <section class="section" id="actualites">
+      <div class="section-header">
+        <div class="section-icon"><i class="fas fa-newspaper"></i></div>
+        <div>
+          <h2 class="section-title">Informations du Jour</h2>
+          <p class="section-subtitle" id="newsSubtitle">Les dernières actualités et reportages</p>
+        </div>
+        <div class="section-toolbar">
+          <span class="result-count" id="resultCount"></span>
+        </div>
+      </div>
+      <div class="news-grid" id="newsGrid">
+        <div class="skeleton-grid" aria-hidden="true">
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+        </div>
+      </div>
+    </section>
 
-        <!-- Live Section -->
-        <section class="section" id="direct">
-            <div class="section-header">
-                <div class="section-icon">
-                    <i class="fas fa-broadcast-tower"></i>
-                </div>
-                <div>
-                    <h2 class="section-title">Direct en Cours</h2>
-                    <p class="section-subtitle">Suivez nos émissions en direct</p>
-                </div>
-            </div>
-            <div class="live-grid" id="liveGrid">
-                <div class="loading">
-                    <div class="spinner"></div>
-                </div>
-            </div>
-        </section>
+    <section class="section" id="direct">
+      <div class="section-header">
+        <div class="section-icon"><i class="fas fa-broadcast-tower"></i></div>
+        <div>
+          <h2 class="section-title">Direct en Cours</h2>
+          <p class="section-subtitle">Suivez nos émissions en direct</p>
+        </div>
+      </div>
+      <div class="live-grid" id="liveGrid">
+        <div class="skeleton-grid" aria-hidden="true">
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+        </div>
+      </div>
+    </section>
 
-        <!-- Downloads Section -->
-        <section class="section" id="fichiers">
-            <div class="section-header">
-                <div class="section-icon">
-                    <i class="fas fa-download"></i>
-                </div>
-                <div>
-                    <h2 class="section-title">Fichiers à Télécharger</h2>
-                    <p class="section-subtitle">Documents et ressources disponibles</p>
-                </div>
-            </div>
-            <div class="downloads-grid" id="downloadsGrid">
-                <div class="loading">
-                    <div class="spinner"></div>
-                </div>
-            </div>
-        </section>
+    <section class="section" id="fichiers">
+      <div class="section-header">
+        <div class="section-icon"><i class="fas fa-images"></i></div>
+        <div>
+          <h2 class="section-title">Prestations & Galeries</h2>
+          <p class="section-subtitle">Retrouvez les photos et vidéos de vos événements couverts par LTcine TV</p>
+        </div>
+      </div>
 
-        <!-- Share Section -->
-        <section class="share-section" id="partage">
-            <div class="share-content">
-                <h2 class="share-title">
-                    <i class="fas fa-share-alt"></i>
-                    Je partage une information
-                </h2>
-                <p class="share-text">
-                    Vous avez une information importante à partager ? Contactez-nous directement sur WhatsApp !
-                </p>
-                <a href="https://wa.me/22673669104" target="_blank" class="whatsapp-btn">
-                    <i class="fab fa-whatsapp"></i>
-                    +226 73 66 91 04
-                </a>
-            </div>
-        </section>
+      <div class="media-intro">
+        <div class="media-intro-text">
+          <span class="media-kicker">Vos événements, accessibles simplement</span>
+          <h3>Retrouvez votre reportage, vos photos ou vos vidéos</h3>
+          <p>
+            Après une prestation LTcine TV, recherchez votre événement ci-dessous puis ouvrez
+            directement sa galerie ou son espace média.
+          </p>
+        </div>
+        <div class="media-capabilities" aria-label="Prestations disponibles">
+          <span><i class="fas fa-camera"></i> Photos</span>
+          <span><i class="fas fa-video"></i> Vidéos</span>
+          <span><i class="fas fa-microphone-lines"></i> Reportages</span>
+          <span><i class="fas fa-heart"></i> Mariages & événements</span>
+        </div>
+      </div>
 
-        <!-- Subscribe Section -->
-        <section class="section">
-            <div class="section-header">
-                <div class="section-icon">
-                    <i class="fas fa-bell"></i>
-                </div>
-                <div>
-                    <h2 class="section-title">Recevez nos Notifications</h2>
-                    <p class="section-subtitle">Inscrivez-vous pour ne rien manquer</p>
-                </div>
+      <div class="downloads-grid" id="downloadsGrid">
+        <div class="skeleton-grid" aria-hidden="true">
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="section about-section" id="a-propos">
+      <div class="section-header">
+        <div class="section-icon"><i class="fas fa-circle-info"></i></div>
+        <div>
+          <h2 class="section-title">À propos de LTcine TV</h2>
+          <p class="section-subtitle">Notre raison d'être et notre vision</p>
+        </div>
+      </div>
+
+      <div class="about-content">
+        <div class="about-main">
+          <span class="about-kicker">Notre mission</span>
+          <h3>Faciliter la communication et contribuer à l'édification du corps de Christ</h3>
+          <p>
+            LTcine TV veut réunir, à travers le digital, ceux qui reconnaissent Jésus-Christ
+            comme le socle de leur salut et reconnaissent la suffisance de son œuvre.
+          </p>
+          <p>
+            La plateforme ne cherche pas à effacer la diversité des sensibilités chrétiennes,
+            mais à créer un espace de communication, de partage et d'édification autour de
+            ce fondement commun : Jésus-Christ.
+          </p>
+        </div>
+
+        <div class="about-pillars">
+          <article>
+            <i class="fas fa-cross"></i>
+            <div>
+              <h4>Christ au centre</h4>
+              <p>Jésus-Christ demeure le fondement commun de la plateforme.</p>
             </div>
-            <form class="subscribe-form" id="subscribeForm">
-                <div class="input-group">
-                    <i class="fas fa-user"></i>
-                    <input type="text" id="userName" placeholder="Votre nom complet" required>
-                </div>
-                <div class="input-group">
-                    <i class="fas fa-envelope"></i>
-                    <input type="email" id="userEmail" placeholder="Votre adresse Gmail" required>
-                </div>
-                <button type="submit" class="subscribe-btn" id="subscribeBtn">
-                    <i class="fas fa-paper-plane"></i>
-                    S'inscrire aux notifications
-                </button>
-            </form>
-        </section>
+          </article>
+
+          <article>
+            <i class="fas fa-people-group"></i>
+            <div>
+              <h4>Unité dans la diversité</h4>
+              <p>Créer des ponts et faciliter la communication entre les différentes sensibilités.</p>
+            </div>
+          </article>
+
+          <article>
+            <i class="fas fa-mobile-screen-button"></i>
+            <div>
+              <h4>Édification par le digital</h4>
+              <p>Mettre les médias, les messages, la photo et la vidéo au service de l'édification.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="share-section" id="partage">
+      <div class="share-content">
+        <h2 class="share-title">Je partage une information</h2>
+        <p class="share-text">
+          Vous avez une information importante à transmettre ? Contactez l'équipe LTcine TV
+          via WhatsApp grâce à un accès direct, mis en valeur par un design plus lisible et plus moderne.
+        </p>
+
+        <div class="whatsapp-card">
+          <a href="https://wa.me/22673669104" target="_blank" rel="noopener noreferrer" class="whatsapp-btn">
+            <span class="whatsapp-icon-wrap" aria-hidden="true">
+              <i class="fab fa-whatsapp"></i>
+            </span>
+            <span class="whatsapp-text">
+              <span class="whatsapp-label">Contact WhatsApp</span>
+              <span class="whatsapp-number">+226 73 66 91 04</span>
+            </span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <div class="section-icon"><i class="fas fa-bell"></i></div>
+        <div>
+          <h2 class="section-title">Recevez nos Notifications</h2>
+          <p class="section-subtitle">Inscrivez-vous pour ne rien manquer</p>
+        </div>
+      </div>
+
+      <form class="subscribe-form" id="subscribeForm" novalidate>
+        <div class="input-group">
+          <i class="fas fa-user"></i>
+          <label for="userName" class="sr-only">Votre nom complet</label>
+          <input type="text" id="userName" placeholder="Votre nom complet" maxlength="80" autocomplete="name" required>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-envelope"></i>
+          <label for="userEmail" class="sr-only">Votre adresse Gmail</label>
+          <input type="email" id="userEmail" placeholder="Votre adresse Gmail" maxlength="120" autocomplete="email" required>
+        </div>
+        <button type="submit" class="subscribe-btn" id="subscribeBtn">
+          <i class="fas fa-paper-plane"></i>
+          S'inscrire aux notifications
+        </button>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>LTcine TV</h3>
+        <p>Une plateforme digitale chrétienne dédiée à la communication, à l'unité en Christ et à l'édification du corps de Christ.</p>
+        <div class="social-links">
+          <a href="https://www.facebook.com/share/1CBdvAu4oc/" target="_blank" rel="noopener noreferrer" class="social-link" title="Facebook" aria-label="Facebook">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="https://www.youtube.com/@ltcinetv" target="_blank" rel="noopener noreferrer" class="social-link" title="YouTube" aria-label="YouTube">
+            <i class="fab fa-youtube"></i>
+          </a>
+          <a href="https://tiktok.com/@ltcinetv" target="_blank" rel="noopener noreferrer" class="social-link" title="TikTok" aria-label="TikTok">
+            <i class="fab fa-tiktok"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-section">
+        <h3>Liens Rapides</h3>
+        <a href="#accueil">Accueil</a>
+        <a href="#verset">Verset du Jour</a>
+        <a href="#actualites">Actualités</a>
+        <a href="#direct">Direct</a>
+        <a href="#fichiers">Prestations & Galeries</a>
+        <a href="#a-propos">À propos</a>
+        <a href="#partage">Partager</a>
+      </div>
+
+      <div class="footer-section">
+        <h3>Contact</h3>
+        <p><i class="fab fa-whatsapp"></i> +226 73 66 91 04</p>
+        <p><i class="fas fa-envelope"></i> ltcine@gmail.com</p>
+        <p><i class="fas fa-map-marker-alt"></i> Burkina Faso</p>
+      </div>
     </div>
 
-    <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>LTcine TV</h3>
-                <p>Votre source d'information fiable et quotidienne. Nous couvrons l'actualité, les reportages, l'évangélisation et bien plus encore.</p>
-                <div class="social-links">
-                    <a href="https://www.facebook.com/share/1CBdvAu4oc/" target="_blank" class="social-link" title="Facebook">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="https://www.youtube.com/@ltcinetv" target="_blank" class="social-link" title="YouTube">
-                        <i class="fab fa-youtube"></i>
-                    </a>
-                    <a href="https://tiktok.com/@ltcinetv" target="_blank" class="social-link" title="TikTok">
-                        <i class="fab fa-tiktok"></i>
-                    </a>
-                </div>
-            </div>
-            
-            <div class="footer-section">
-                <h3>Liens Rapides</h3>
-                <a href="#accueil">Accueil</a>
-                <a href="#verset">Verset du Jour</a>
-                <a href="#actualites">Actualités</a>
-                <a href="#direct">Direct</a>
-                <a href="#fichiers">Fichiers</a>
-                <a href="#partage">Partager</a>
-            </div>
-            
-            <div class="footer-section">
-                <h3>Contact</h3>
-                <p><i class="fab fa-whatsapp"></i> +226 73 66 91 04</p>
-                <p><i class="fas fa-envelope"></i> ltcine@gmail.com</p>
-                <p><i class="fas fa-map-marker-alt"></i> Burkina Faso</p>
-            </div>
-        </div>
-        
-        <div class="footer-bottom">
-            <p>&copy; 2026 LTcine TV. Tous droits réservés.</p>
-            <p>Developed by <strong>Josias Lawatali Paré</strong></p>
-        </div>
-    </footer>
+    <div class="footer-bottom">
+      <p>&copy; 2026 LTcine TV. Tous droits réservés.</p>
+      <p>Developed by <strong>Josias Lawatali Paré</strong></p>
+    </div>
+  </footer>
 
-    <!-- Toast Notification -->
-    <div class="toast" id="toast"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-    <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyCcM46qQo3bTCFo_hmwoYLvOKWVhqLJdnQ",
-            authDomain: "ltcine.firebaseapp.com",
-            projectId: "ltcine",
-            storageBucket: "ltcine.firebasestorage.app",
-            messagingSenderId: "432697683333",
-            appId: "1:432697683333:web:c9069d1e82827c608168ec",
-            measurementId: "G-E33CXDWHNF"
-        };
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+  <script>
+    'use strict';
 
-        // Mobile Menu Toggle
-        function toggleMenu() {
-            const navLinks = document.getElementById('navLinks');
-            navLinks.classList.toggle('active');
+    const firebaseConfig = {
+      apiKey: "AIzaSyCcM46qQo3bTCFo_hmwoYLvOKWVhqLJdnQ",
+      authDomain: "ltcine.firebaseapp.com",
+      projectId: "ltcine",
+      storageBucket: "ltcine.firebasestorage.app",
+      messagingSenderId: "432697683333",
+      appId: "1:432697683333:web:c9069d1e82827c608168ec",
+      measurementId: "G-E33CXDWHNF"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const state = {
+      news: [],
+      activeCategory: 'all',
+      search: '',
+      refreshTimer: null
+    };
+
+    const categoryIcons = {
+      'actualites': 'fa-newspaper',
+      'reportages': 'fa-video',
+      'publicites': 'fa-bullhorn',
+      'debats': 'fa-comments',
+      'micro-trottoirs': 'fa-microphone',
+      'evangelisation': 'fa-cross',
+      'mariage': 'fa-heart',
+      'message': 'fa-message'
+    };
+
+    const categoryLabels = {
+      'actualites': 'Actualités',
+      'reportages': 'Reportages',
+      'publicites': 'Publicités',
+      'debats': 'Débats',
+      'micro-trottoirs': 'Micro-trottoirs',
+      'evangelisation': 'Évangélisation',
+      'mariage': 'Mariage',
+      'message': 'Message'
+    };
+
+    const $ = (selector, parent = document) => parent.querySelector(selector);
+    const $$ = (selector, parent = document) => [...parent.querySelectorAll(selector)];
+
+    function safeExternalUrl(value) {
+      if (typeof value !== 'string') return null;
+      try {
+        const url = new URL(value.trim(), window.location.origin);
+        if (url.protocol !== 'https:' && url.protocol !== 'http:') return null;
+        return url.href;
+      } catch {
+        return null;
+      }
+    }
+
+    function normalizeText(value, maxLength = 5000) {
+      if (value === null || value === undefined) return '';
+      return String(value).trim().slice(0, maxLength);
+    }
+
+    function formatDate(timestamp) {
+      try {
+        if (!timestamp || typeof timestamp.toDate !== 'function') return '';
+        return new Intl.DateTimeFormat('fr-FR', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        }).format(timestamp.toDate());
+      } catch {
+        return '';
+      }
+    }
+
+    function showToast(message, type = 'success') {
+      const toast = $('#toast');
+      toast.textContent = normalizeText(message, 220);
+      toast.className = `toast ${type} show`;
+
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3600);
+    }
+
+    function emptyState(message, isError = false) {
+      const p = document.createElement('p');
+      p.className = isError ? 'error-state' : 'empty-state';
+      p.textContent = message;
+      return p;
+    }
+
+    function openMenu() {
+      $('#sideMenu').classList.add('active');
+      $('#menuBackdrop').classList.add('active');
+      $('#menuBtn').setAttribute('aria-expanded', 'true');
+      $('#sideMenu').setAttribute('aria-hidden', 'false');
+      document.body.classList.add('menu-open');
+      $('#menuClose').focus();
+    }
+
+    function closeMenu(returnFocus = false) {
+      $('#sideMenu').classList.remove('active');
+      $('#menuBackdrop').classList.remove('active');
+      $('#menuBtn').setAttribute('aria-expanded', 'false');
+      $('#sideMenu').setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('menu-open');
+      if (returnFocus) $('#menuBtn').focus();
+    }
+
+    $('#menuBtn').addEventListener('click', openMenu);
+    $('#menuClose').addEventListener('click', () => closeMenu(true));
+    $('#menuBackdrop').addEventListener('click', () => closeMenu(false));
+
+    $$('.menu-nav a').forEach(link => {
+      link.addEventListener('click', () => closeMenu(false));
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        if ($('#sideMenu').classList.contains('active')) closeMenu(true);
+        const modal = $('.article-modal');
+        if (modal) closeArticleModal(modal);
+      }
+    });
+
+    function renderTicker(items) {
+      const container = $('#tickerContent');
+      container.replaceChildren();
+
+      const texts = items.length
+        ? items
+        : [
+            'Bienvenue sur LTcine TV - Votre source d’information fiable',
+            'Actualités • Reportages • Messages • Débats • Micro-trottoirs • Évangélisation • Mariage'
+          ];
+
+      [...texts, ...texts].forEach(text => {
+        const item = document.createElement('div');
+        item.className = 'ticker-item';
+        item.textContent = normalizeText(text, 240);
+        container.appendChild(item);
+      });
+    }
+
+    async function loadTicker() {
+      try {
+        const snapshot = await db.collection('ticker')
+          .orderBy('timestamp', 'desc')
+          .limit(10)
+          .get();
+
+        const texts = snapshot.docs
+          .map(doc => normalizeText(doc.data().text, 240))
+          .filter(Boolean);
+
+        renderTicker(texts);
+      } catch (error) {
+        console.error('Erreur ticker:', error);
+        renderTicker([]);
+      }
+    }
+
+    function renderVerse(data) {
+      const container = $('#verseContent');
+      const wrapper = document.createElement('div');
+      wrapper.className = 'verse-content';
+
+      const text = document.createElement('p');
+      text.className = 'verse-text';
+      text.textContent = normalizeText(data.text, 2500);
+
+      const ref = document.createElement('p');
+      ref.className = 'verse-reference';
+      ref.textContent = `— ${normalizeText(data.reference, 100)}`;
+
+      wrapper.append(text, ref);
+      container.replaceChildren(wrapper);
+    }
+
+    async function loadVerse() {
+      const fallback = {
+        text: "Car Dieu a tant aimé le monde qu'il a donné son Fils unique, afin que quiconque croit en lui ne périsse point, mais qu'il ait la vie éternelle.",
+        reference: 'Jean 3:16'
+      };
+
+      try {
+        const now = new Date();
+        const today = [
+          now.getFullYear(),
+          String(now.getMonth() + 1).padStart(2, '0'),
+          String(now.getDate()).padStart(2, '0')
+        ].join('-');
+
+        const todaySnapshot = await db.collection('verses')
+          .where('date', '==', today)
+          .limit(1)
+          .get();
+
+        if (!todaySnapshot.empty) {
+          renderVerse(todaySnapshot.docs[0].data());
+          return;
         }
 
-        // Toast Notification
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = `toast ${type} show`;
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 4000);
-        }
+        const latestSnapshot = await db.collection('verses')
+          .orderBy('date', 'desc')
+          .limit(1)
+          .get();
 
-        // Load Ticker Data
-        async function loadTicker() {
-            try {
-                const snapshot = await db.collection('ticker').orderBy('timestamp', 'desc').limit(10).get();
-                const tickerContent = document.getElementById('tickerContent');
-                
-                if (snapshot.empty) {
-                    tickerContent.innerHTML = `
-                        <div class="ticker-item">Bienvenue sur LTcine TV - Votre source d'information fiable</div>
-                        <div class="ticker-item">Actualités • Reportages • Publicités • Débats • Micro-trottoirs • Évangélisation • Mariage</div>
-                    `;
-                    return;
-                }
+        renderVerse(latestSnapshot.empty ? fallback : latestSnapshot.docs[0].data());
+      } catch (error) {
+        console.error('Erreur verset:', error);
+        renderVerse(fallback);
+      }
+    }
 
-                let html = '';
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    html += `<div class="ticker-item">${data.text}</div>`;
-                });
-                
-                tickerContent.innerHTML = html + html;
-            } catch (error) {
-                console.error('Error loading ticker:', error);
-            }
-        }
+    function getFilteredNews() {
+      const term = state.search.trim().toLocaleLowerCase('fr');
+      const category = state.activeCategory;
 
-        // Load Verse of the Day
-        async function loadVerse() {
-            try {
-                const today = new Date().toISOString().split('T')[0];
-                const snapshot = await db.collection('verses').where('date', '==', today).get();
-                const verseContent = document.getElementById('verseContent');
-                
-                if (snapshot.empty) {
-                    const latestSnapshot = await db.collection('verses').orderBy('date', 'desc').limit(1).get();
-                    
-                    if (latestSnapshot.empty) {
-                        verseContent.innerHTML = `
-                            <div class="verse-content">
-                                <p class="verse-text">Car Dieu a tant aimé le monde qu'il a donné son Fils unique, afin que quiconque croit en lui ne périsse point, mais qu'il ait la vie éternelle.</p>
-                                <p class="verse-reference">- Jean 3:16</p>
-                            </div>
-                        `;
-                        return;
-                    }
+      return state.news.filter(item => {
+        const categoryMatch = category === 'all' || item.category === category;
+        if (!categoryMatch) return false;
 
-                    const verse = latestSnapshot.docs[0].data();
-                    verseContent.innerHTML = `
-                        <div class="verse-content">
-                            <p class="verse-text">${verse.text}</p>
-                            <p class="verse-reference">- ${verse.reference}</p>
-                        </div>
-                    `;
-                    return;
-                }
+        if (!term) return true;
 
-                const verse = snapshot.docs[0].data();
-                verseContent.innerHTML = `
-                    <div class="verse-content">
-                        <p class="verse-text">${verse.text}</p>
-                        <p class="verse-reference">- ${verse.reference}</p>
-                    </div>
-                `;
-            } catch (error) {
-                console.error('Error loading verse:', error);
-            }
-        }
+        const haystack = [
+          item.title,
+          item.excerpt,
+          item.content,
+          categoryLabels[item.category] || item.category
+        ].join(' ').toLocaleLowerCase('fr');
 
-        // Load News
-        async function loadNews() {
-            try {
-                const snapshot = await db.collection('news').orderBy('timestamp', 'desc').limit(9).get();
-                const newsGrid = document.getElementById('newsGrid');
-                
-                if (snapshot.empty) {
-                    newsGrid.innerHTML = '<p style="color: rgba(255,255,255,0.7); text-align: center; grid-column: 1/-1; padding: 3rem;">Aucune actualité disponible pour le moment.</p>';
-                    return;
-                }
+        return haystack.includes(term);
+      });
+    }
 
-                let html = '';
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const date = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleDateString('fr-FR', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    }) : '';
-                    
-                    const categoryIcons = {
-                        'actualites': 'fa-newspaper',
-                        'reportages': 'fa-video',
-                        'publicites': 'fa-bullhorn',
-                        'debats': 'fa-comments',
-                        'micro-trottoirs': 'fa-microphone',
-                        'evangelisation': 'fa-cross',
-                        'mariage': 'fa-heart'
-                    };
-                    
-                    const icon = categoryIcons[data.category] || 'fa-newspaper';
-                    const categoryLabel = data.category || 'Actualités';
-                    
-                    html += `
-                        <div class="news-card">
-                            <div class="news-image">
-                                <span class="news-category">${categoryLabel}</span>
-                                <i class="fas ${icon}"></i>
-                            </div>
-                            <div class="news-content">
-                                <div class="news-date"><i class="fas fa-calendar"></i> ${date}</div>
-                                <h3 class="news-title">${data.title}</h3>
-                                <p class="news-excerpt">${data.excerpt || data.content.substring(0, 150)}...</p>
-                                <a href="#" class="news-read-more" onclick="showFullArticle('${doc.id}')">
-                                    Lire la suite <i class="fas fa-arrow-right"></i>
-                                </a>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                newsGrid.innerHTML = html;
-            } catch (error) {
-                console.error('Error loading news:', error);
-                document.getElementById('newsGrid').innerHTML = '<p style="color: rgba(255,255,255,0.7); text-align: center; grid-column: 1/-1;">Erreur lors du chargement des actualités.</p>';
-            }
-        }
+    function createNewsCard(item) {
+      const card = document.createElement('article');
+      card.className = 'news-card';
 
-        // Show Full Article
-        function showFullArticle(articleId) {
-            db.collection('news').doc(articleId).get().then(doc => {
-                if (doc.exists) {
-                    const data = doc.data();
-                    const modal = document.createElement('div');
-                    modal.style.cssText = `
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        bottom: 0;
-                        background: rgba(0,0,0,0.8);
-                        backdrop-filter: blur(10px);
-                        z-index: 3000;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        padding: 2rem;
-                        overflow-y: auto;
-                    `;
-                    
-                    modal.innerHTML = `
-                        <div style="
-                            background: linear-gradient(135deg, #1E3A8A, #0F172A);
-                            border: 1px solid rgba(255,255,255,0.2);
-                            border-radius: 24px;
-                            padding: 3rem;
-                            max-width: 900px;
-                            width: 100%;
-                            max-height: 90vh;
-                            overflow-y: auto;
-                            position: relative;
-                            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-                        ">
-                            <button onclick="this.parentElement.parentElement.remove()" style="
-                                position: absolute;
-                                top: 1rem;
-                                right: 1rem;
-                                background: rgba(255,255,255,0.1);
-                                border: none;
-                                color: white;
-                                width: 40px;
-                                height: 40px;
-                                border-radius: 50%;
-                                cursor: pointer;
-                                font-size: 1.2rem;
-                                transition: all 0.3s ease;
-                            " onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
-                                <i class="fas fa-times"></i>
-                            </button>
-                            <h2 style="color: white; font-size: 2rem; margin-bottom: 1rem; font-weight: 800;">${data.title}</h2>
-                            <p style="color: var(--primary-yellow); margin-bottom: 2rem; font-weight: 600;">
-                                <i class="fas fa-calendar"></i> ${new Date(data.timestamp.toDate()).toLocaleDateString('fr-FR', {
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric'
-                                })}
-                            </p>
-                            <div style="color: rgba(255,255,255,0.9); line-height: 1.8; font-size: 1.1rem; white-space: pre-wrap;">${data.content}</div>
-                        </div>
-                    `;
-                    
-                    document.body.appendChild(modal);
-                    modal.onclick = (e) => {
-                        if (e.target === modal) modal.remove();
-                    };
-                }
-            });
-        }
+      const media = document.createElement('div');
+      media.className = 'news-image';
 
-        // Load Live Streams
-        async function loadLive() {
-            try {
-                const snapshot = await db.collection('live').where('active', '==', true).orderBy('timestamp', 'desc').get();
-                const liveGrid = document.getElementById('liveGrid');
-                
-                if (snapshot.empty) {
-                    liveGrid.innerHTML = '<p style="color: rgba(255,255,255,0.7); text-align: center; grid-column: 1/-1; padding: 3rem;">Aucun direct en cours pour le moment.</p>';
-                    return;
-                }
+      const imageUrl = safeExternalUrl(item.imageUrl || item.image || '');
+      if (imageUrl) {
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.alt = item.title ? `Illustration : ${item.title}` : 'Illustration de l’actualité';
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        img.referrerPolicy = 'no-referrer';
+        img.addEventListener('error', () => {
+          img.remove();
+          const icon = document.createElement('i');
+          icon.className = `fas ${categoryIcons[item.category] || 'fa-newspaper'}`;
+          media.appendChild(icon);
+        }, { once: true });
+        media.appendChild(img);
+      } else {
+        const icon = document.createElement('i');
+        icon.className = `fas ${categoryIcons[item.category] || 'fa-newspaper'}`;
+        media.appendChild(icon);
+      }
 
-                let html = '';
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const platformIcon = data.platform === 'youtube' ? 'fa-youtube' : 'fa-facebook';
-                    const platformClass = data.platform === 'youtube' ? 'youtube' : 'facebook';
-                    
-                    html += `
-                        <div class="live-card">
-                            <div class="live-platform">
-                                <div class="live-platform-icon ${platformClass}">
-                                    <i class="fab ${platformIcon}"></i>
-                                </div>
-                                <div class="live-platform-name">${data.platform === 'youtube' ? 'YouTube' : 'Facebook'}</div>
-                            </div>
-                            <h3 class="live-title">${data.title}</h3>
-                            <a href="${data.link}" target="_blank" class="live-link">
-                                <i class="fas fa-play"></i>
-                                Regarder le direct
-                            </a>
-                        </div>
-                    `;
-                });
-                
-                liveGrid.innerHTML = html;
-            } catch (error) {
-                console.error('Error loading live:', error);
-            }
-        }
+      const content = document.createElement('div');
+      content.className = 'news-content';
 
-        // Load Downloads
-        async function loadDownloads() {
-            try {
-                const snapshot = await db.collection('downloads').orderBy('timestamp', 'desc').get();
-                const downloadsGrid = document.getElementById('downloadsGrid');
-                
-                if (snapshot.empty) {
-                    downloadsGrid.innerHTML = '<p style="color: rgba(255,255,255,0.7); text-align: center; grid-column: 1/-1; padding: 3rem;">Aucun fichier disponible pour le moment.</p>';
-                    return;
-                }
+      const date = document.createElement('div');
+      date.className = 'news-date';
+      const dateIcon = document.createElement('i');
+      dateIcon.className = 'fas fa-calendar';
+      const dateText = document.createElement('span');
+      dateText.textContent = item.date || 'Date non précisée';
+      date.append(dateIcon, dateText);
 
-                let html = '';
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    
-                    html += `
-                        <div class="download-card">
-                            <div class="download-icon">
-                                <i class="fas fa-file-download"></i>
-                            </div>
-                            <h3 class="download-title">${data.title}</h3>
-                            <p class="download-description">${data.description}</p>
-                            <a href="${data.link}" target="_blank" class="download-btn">
-                                <i class="fas fa-download"></i>
-                                Télécharger
-                            </a>
-                        </div>
-                    `;
-                });
-                
-                downloadsGrid.innerHTML = html;
-            } catch (error) {
-                console.error('Error loading downloads:', error);
-            }
-        }
+      const title = document.createElement('h3');
+      title.className = 'news-title';
+      title.textContent = item.title || 'Sans titre';
 
-        // Subscribe Form
-        document.getElementById('subscribeForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const name = document.getElementById('userName').value;
-            const email = document.getElementById('userEmail').value;
-            const btn = document.getElementById('subscribeBtn');
-            
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Inscription en cours...';
-            
-            try {
-                if (!email.endsWith('@gmail.com')) {
-                    throw new Error('Veuillez utiliser une adresse Gmail');
-                }
-                
-                await db.collection('subscribers').add({
-                    name: name,
-                    email: email,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    active: true
-                });
-                
-                showToast('Inscription réussie ! Vous recevrez nos notifications.', 'success');
-                document.getElementById('subscribeForm').reset();
-            } catch (error) {
-                console.error('Error subscribing:', error);
-                showToast(error.message || 'Erreur lors de l\'inscription', 'error');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-paper-plane"></i> S\'inscrire aux notifications';
-            }
+      const excerpt = document.createElement('p');
+      excerpt.className = 'news-excerpt';
+      excerpt.textContent = item.excerpt || item.content.slice(0, 180) || 'Aucun résumé disponible.';
+
+      const readMore = document.createElement('button');
+      readMore.type = 'button';
+      readMore.className = 'news-read-more';
+      readMore.innerHTML = 'Lire la suite <i class="fas fa-arrow-right" aria-hidden="true"></i>';
+      readMore.addEventListener('click', () => showFullArticle(item.id));
+
+      content.append(date, title, excerpt, readMore);
+      card.append(media, content);
+      return card;
+    }
+
+    function renderNews() {
+      const grid = $('#newsGrid');
+      const filtered = getFilteredNews();
+      grid.replaceChildren();
+
+      const subtitle = $('#newsSubtitle');
+      const resultCount = $('#resultCount');
+
+      if (state.activeCategory !== 'all') {
+        subtitle.textContent = `Filtre : ${categoryLabels[state.activeCategory] || state.activeCategory}`;
+      } else if (state.search) {
+        subtitle.textContent = `Résultats pour « ${state.search.slice(0, 40)} »`;
+      } else {
+        subtitle.textContent = 'Les dernières actualités et reportages';
+      }
+
+      resultCount.textContent = filtered.length
+        ? `${filtered.length} résultat${filtered.length > 1 ? 's' : ''}`
+        : '';
+
+      if (!filtered.length) {
+        grid.appendChild(emptyState(
+          state.search || state.activeCategory !== 'all'
+            ? 'Aucune actualité ne correspond à votre recherche.'
+            : 'Aucune actualité disponible pour le moment.'
+        ));
+        return;
+      }
+
+      const fragment = document.createDocumentFragment();
+      filtered.forEach(item => fragment.appendChild(createNewsCard(item)));
+      grid.appendChild(fragment);
+    }
+
+    async function loadNews() {
+      try {
+        const snapshot = await db.collection('news')
+          .orderBy('timestamp', 'desc')
+          .limit(30)
+          .get();
+
+        state.news = snapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            title: normalizeText(data.title, 220),
+            excerpt: normalizeText(data.excerpt, 600),
+            content: normalizeText(data.content, 12000),
+            category: normalizeText(data.category, 60).toLocaleLowerCase('fr'),
+            imageUrl: normalizeText(data.imageUrl, 1000),
+            image: normalizeText(data.image, 1000),
+            date: formatDate(data.timestamp),
+            timestamp: data.timestamp || null
+          };
         });
 
-        // Smooth Scroll
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                    document.getElementById('navLinks').classList.remove('active');
-                }
-            });
+        renderNews();
+      } catch (error) {
+        console.error('Erreur actualités:', error);
+        $('#newsGrid').replaceChildren(emptyState(
+          'Impossible de charger les actualités pour le moment.',
+          true
+        ));
+      }
+    }
+
+    function showFullArticle(articleId) {
+      const item = state.news.find(article => article.id === articleId);
+      if (!item) return;
+
+      const modal = document.createElement('div');
+      modal.className = 'article-modal';
+      modal.setAttribute('role', 'dialog');
+      modal.setAttribute('aria-modal', 'true');
+      modal.setAttribute('aria-labelledby', 'articleModalTitle');
+
+      const dialog = document.createElement('article');
+      dialog.className = 'article-dialog';
+
+      const close = document.createElement('button');
+      close.className = 'article-close';
+      close.type = 'button';
+      close.setAttribute('aria-label', 'Fermer l’article');
+      close.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i>';
+
+      const title = document.createElement('h2');
+      title.id = 'articleModalTitle';
+      title.className = 'article-modal-title';
+      title.textContent = item.title || 'Article';
+
+      const meta = document.createElement('p');
+      meta.className = 'article-meta';
+      meta.textContent = item.date || '';
+
+      const body = document.createElement('div');
+      body.className = 'article-body';
+      body.textContent = item.content || item.excerpt || 'Contenu indisponible.';
+
+      dialog.append(close, title, meta, body);
+      modal.appendChild(dialog);
+      document.body.appendChild(modal);
+      document.body.classList.add('modal-open');
+
+      close.addEventListener('click', () => closeArticleModal(modal));
+      modal.addEventListener('click', event => {
+        if (event.target === modal) closeArticleModal(modal);
+      });
+
+      close.focus();
+    }
+
+    function closeArticleModal(modal) {
+      if (!modal) return;
+      modal.remove();
+      document.body.classList.remove('modal-open');
+    }
+
+    function createLiveCard(item) {
+      const card = document.createElement('article');
+      card.className = 'live-card';
+
+      const badge = document.createElement('span');
+      badge.className = 'live-badge';
+      badge.textContent = 'LIVE';
+
+      const platform = item.platform === 'youtube' ? 'youtube' : 'facebook';
+      const platformRow = document.createElement('div');
+      platformRow.className = 'live-platform';
+
+      const iconBox = document.createElement('div');
+      iconBox.className = `live-platform-icon ${platform}`;
+      const icon = document.createElement('i');
+      icon.className = `fab ${platform === 'youtube' ? 'fa-youtube' : 'fa-facebook-f'}`;
+      iconBox.appendChild(icon);
+
+      const name = document.createElement('div');
+      name.className = 'live-platform-name';
+      name.textContent = platform === 'youtube' ? 'YouTube' : 'Facebook';
+
+      platformRow.append(iconBox, name);
+
+      const title = document.createElement('h3');
+      title.className = 'live-title';
+      title.textContent = item.title || 'Direct LTcine TV';
+
+      const link = document.createElement('a');
+      link.className = 'live-link';
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = 'Regarder le direct';
+
+      const safeLink = safeExternalUrl(item.link);
+      if (safeLink) {
+        link.href = safeLink;
+        const play = document.createElement('i');
+        play.className = 'fas fa-play';
+        link.prepend(play);
+      } else {
+        link.href = '#';
+        link.setAttribute('aria-disabled', 'true');
+        link.addEventListener('click', event => event.preventDefault());
+        link.textContent = 'Lien indisponible';
+      }
+
+      card.append(badge, platformRow, title, link);
+      return card;
+    }
+
+    async function loadLive() {
+      const grid = $('#liveGrid');
+
+      try {
+        const snapshot = await db.collection('live')
+          .where('active', '==', true)
+          .orderBy('timestamp', 'desc')
+          .get();
+
+        grid.replaceChildren();
+
+        if (snapshot.empty) {
+          grid.appendChild(emptyState('Aucun direct en cours pour le moment.'));
+          return;
+        }
+
+        const fragment = document.createDocumentFragment();
+
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          fragment.appendChild(createLiveCard({
+            title: normalizeText(data.title, 220),
+            platform: normalizeText(data.platform, 30).toLowerCase(),
+            link: normalizeText(data.link, 1000)
+          }));
         });
 
-        // Initialize
-        window.addEventListener('load', () => {
-            loadTicker();
-            loadVerse();
-            loadNews();
-            loadLive();
-            loadDownloads();
+        grid.appendChild(fragment);
+      } catch (error) {
+        console.error('Erreur directs:', error);
+        grid.replaceChildren(emptyState('Impossible de charger les directs.', true));
+      }
+    }
+
+    function createDownloadCard(item) {
+      const card = document.createElement('article');
+      card.className = 'download-card';
+
+      const icon = document.createElement('div');
+      icon.className = 'download-icon';
+      icon.innerHTML = '<i class="fas fa-images" aria-hidden="true"></i>';
+
+      const title = document.createElement('h3');
+      title.className = 'download-title';
+      title.textContent = item.title || 'Galerie LTcine TV';
+
+      const description = document.createElement('p');
+      description.className = 'download-description';
+      description.textContent = item.description || 'Photos, vidéos et contenus de cette prestation.';
+
+      const link = document.createElement('a');
+      link.className = 'download-btn';
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+
+      const safeLink = safeExternalUrl(item.link);
+      if (safeLink) {
+        link.href = safeLink;
+        link.innerHTML = '<i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i> Accéder à la galerie';
+      } else {
+        link.href = '#';
+        link.setAttribute('aria-disabled', 'true');
+        link.textContent = 'Lien indisponible';
+        link.addEventListener('click', event => event.preventDefault());
+      }
+
+      card.append(icon, title, description, link);
+      return card;
+    }
+
+    async function loadDownloads() {
+      const grid = $('#downloadsGrid');
+
+      try {
+        const snapshot = await db.collection('downloads')
+          .orderBy('timestamp', 'desc')
+          .get();
+
+        grid.replaceChildren();
+
+        if (snapshot.empty) {
+          grid.appendChild(emptyState('Aucune galerie ou prestation publiée pour le moment.'));
+          return;
+        }
+
+        const fragment = document.createDocumentFragment();
+
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          fragment.appendChild(createDownloadCard({
+            title: normalizeText(data.title, 220),
+            description: normalizeText(data.description, 1000),
+            link: normalizeText(data.link, 1000)
+          }));
         });
 
-        // Refresh data every 5 minutes
-        setInterval(() => {
-            loadTicker();
-            loadVerse();
-            loadNews();
-            loadLive();
-            loadDownloads();
-        }, 300000);
-    </script>
+        grid.appendChild(fragment);
+      } catch (error) {
+        console.error('Erreur téléchargements:', error);
+        grid.replaceChildren(emptyState('Impossible de charger les galeries pour le moment.', true));
+      }
+    }
+
+    let searchDebounce;
+
+    $('#globalSearch').addEventListener('input', event => {
+      clearTimeout(searchDebounce);
+      const value = normalizeText(event.target.value, 80);
+
+      $('#searchClear').classList.toggle('visible', Boolean(value));
+
+      searchDebounce = setTimeout(() => {
+        state.search = value;
+        renderNews();
+
+        if (value) {
+          $('#actualites').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 180);
+    });
+
+    $('#searchClear').addEventListener('click', () => {
+      $('#globalSearch').value = '';
+      $('#searchClear').classList.remove('visible');
+      state.search = '';
+      renderNews();
+      $('#globalSearch').focus();
+    });
+
+    $$('.category-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        state.activeCategory = button.dataset.category || 'all';
+
+        $$('.category-btn').forEach(btn => {
+          btn.classList.toggle('active', btn === button);
+        });
+
+        renderNews();
+        closeMenu(false);
+        $('#actualites').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    $('#subscribeForm').addEventListener('submit', async event => {
+      event.preventDefault();
+
+      const nameInput = $('#userName');
+      const emailInput = $('#userEmail');
+      const button = $('#subscribeBtn');
+
+      const name = normalizeText(nameInput.value, 80);
+      const email = normalizeText(emailInput.value, 120).toLowerCase();
+
+      if (name.length < 2) {
+        showToast('Veuillez entrer un nom valide.', 'error');
+        nameInput.focus();
+        return;
+      }
+
+      if (!/^[^\s@]+@gmail\.com$/i.test(email)) {
+        showToast('Veuillez utiliser une adresse Gmail valide.', 'error');
+        emailInput.focus();
+        return;
+      }
+
+      button.disabled = true;
+      button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Inscription en cours…';
+
+      try {
+        const existing = await db.collection('subscribers')
+          .where('email', '==', email)
+          .limit(1)
+          .get();
+
+        if (!existing.empty) {
+          showToast('Cette adresse est déjà inscrite.', 'success');
+          event.currentTarget.reset();
+          return;
+        }
+
+        await db.collection('subscribers').add({
+          name,
+          email,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          active: true
+        });
+
+        showToast('Inscription réussie ! Vous recevrez nos notifications.', 'success');
+        event.currentTarget.reset();
+      } catch (error) {
+        console.error('Erreur inscription:', error);
+        showToast("Erreur lors de l'inscription. Réessayez.", 'error');
+      } finally {
+        button.disabled = false;
+        button.innerHTML = '<i class="fas fa-paper-plane"></i> S\'inscrire aux notifications';
+      }
+    });
+
+    $$('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(event) {
+        const href = this.getAttribute('href');
+        if (!href || href === '#') return;
+
+        const target = document.querySelector(href);
+        if (!target) return;
+
+        event.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    async function loadAllData() {
+      await Promise.allSettled([
+        loadTicker(),
+        loadVerse(),
+        loadNews(),
+        loadLive(),
+        loadDownloads()
+      ]);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderTicker([]);
+      loadAllData();
+
+      clearInterval(state.refreshTimer);
+      state.refreshTimer = setInterval(loadAllData, 300000);
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) loadAllData();
+    });
+  </script>
 </body>
 </html>
