@@ -489,6 +489,42 @@
     .account-divider span { padding: 0 10px; }
 
 
+
+    .oauth-browser-warning {
+      display: grid;
+      grid-template-columns: 38px minmax(0,1fr);
+      gap: 10px;
+      align-items: start;
+      margin-bottom: 1rem;
+      padding: 12px;
+      border-radius: 13px;
+      background: rgba(245,158,11,.08);
+      border: 1px solid rgba(245,158,11,.20);
+      color: rgba(255,255,255,.92);
+    }
+
+    .oauth-browser-warning > i {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      color: #FCD34D;
+      background: rgba(245,158,11,.12);
+    }
+
+    .oauth-browser-warning strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: .86rem;
+    }
+
+    .oauth-browser-warning p {
+      color: var(--text-muted);
+      font-size: .78rem;
+      line-height: 1.55;
+    }
+
     /* SIDE MENU */
     .menu-backdrop {
       position: fixed;
@@ -2249,6 +2285,14 @@
         </div>
       </div>
 
+      <div class="oauth-browser-warning hidden" id="oauthBrowserWarning">
+        <i class="fas fa-triangle-exclamation"></i>
+        <div>
+          <strong>Connexion Google indisponible dans ce navigateur intégré.</strong>
+          <p>Ouvrez cette page dans Chrome, Firefox, Safari ou votre navigateur habituel, puis réessayez.</p>
+        </div>
+      </div>
+
       <div id="memberGuestView">
         <div class="account-tabs" role="tablist" aria-label="Connexion ou inscription">
           <button class="account-tab active" id="loginTabBtn" type="button">Se connecter</button>
@@ -3214,6 +3258,18 @@
 
 
 
+
+    function isEmbeddedBrowser() {
+      const ua = navigator.userAgent || '';
+      return /FBAN|FBAV|Instagram|WhatsApp|Line\/|wv\b|WebView/i.test(ua);
+    }
+
+    function updateOAuthBrowserWarning() {
+      const warning = $('#oauthBrowserWarning');
+      if (!warning) return;
+      warning.classList.toggle('hidden', !isEmbeddedBrowser());
+    }
+
     /* =========================================================
        FENÊTRE COMPTE
     ========================================================= */
@@ -3222,6 +3278,7 @@
       $('#accountModal')?.setAttribute('aria-hidden','false');
       document.body.classList.add('modal-open');
       switchAccountTab(tab);
+      updateOAuthBrowserWarning();
     }
 
     function closeAccountModal() {
@@ -3367,6 +3424,12 @@
     }
 
     $('#googleSignInBtn')?.addEventListener('click', async () => {
+      if (isEmbeddedBrowser()) {
+        showToast('Ouvrez LTcine TV dans Chrome, Firefox, Safari ou votre navigateur habituel pour utiliser Google.', 'error');
+        updateOAuthBrowserWarning();
+        return;
+      }
+
       const btn = $('#googleSignInBtn');
       btn.disabled = true;
 
@@ -3375,16 +3438,15 @@
       } catch (error) {
         console.error('Connexion Google:', error);
 
-        if (error?.code === 'auth/popup-blocked') {
-          try {
-            await auth.signInWithRedirect(googleProvider);
-            return;
-          } catch (redirectError) {
-            console.error('Redirection Google:', redirectError);
-          }
-        }
+        const messages = {
+          'auth/unauthorized-domain': "Ce domaine n'est pas encore autorisé dans Firebase Authentication.",
+          'auth/operation-not-allowed': "La connexion Google n'est pas encore activée dans Firebase Authentication.",
+          'auth/popup-blocked': "Le navigateur a bloqué la fenêtre Google. Autorisez les pop-ups puis réessayez.",
+          'auth/popup-closed-by-user': "La fenêtre Google a été fermée avant la fin de la connexion.",
+          'auth/cancelled-popup-request': "Une autre tentative de connexion est déjà en cours."
+        };
 
-        showToast('Connexion Google impossible pour le moment.', 'error');
+        showToast(messages[error?.code] || 'Connexion Google impossible pour le moment.', 'error');
       } finally {
         btn.disabled = false;
       }
