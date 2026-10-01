@@ -2058,6 +2058,19 @@
     </div>
   </div>
 
+  <aside class="youtube-live-alert hidden" id="youtubeLiveAlert" aria-live="polite">
+    <div class="youtube-live-alert-inner">
+      <span class="youtube-live-dot"></span>
+      <div class="youtube-live-alert-copy">
+        <span class="youtube-live-kicker">LTcine TV • YouTube</span>
+        <strong id="youtubeLiveAlertTitle">Nous sommes en direct</strong>
+      </div>
+      <a id="youtubeLiveAlertLink" class="youtube-live-alert-btn" href="https://www.youtube.com/channel/UCD56Xq7Nn9EM9_sDTBmMxVw/live" target="_blank" rel="noopener noreferrer">
+        <i class="fab fa-youtube"></i> Regarder maintenant
+      </a>
+    </div>
+  </aside>
+
   <section class="hero hero-compact" id="accueil">
     <div class="hero-content hero-content-compact">
       <div class="hero-badge"><i class="fas fa-circle" style="font-size:.48rem;"></i> LTcine TV</div>
@@ -2115,6 +2128,21 @@
           <p class="section-subtitle">Suivez nos émissions en direct</p>
         </div>
       </div>
+      <div class="youtube-auto-live hidden" id="youtubeAutoLive">
+        <div class="youtube-auto-thumb-wrap">
+          <img id="youtubeAutoThumbnail" class="youtube-auto-thumb" alt="Miniature du direct LTcine TV" loading="lazy">
+          <span class="youtube-auto-badge"><span></span> EN DIRECT</span>
+        </div>
+        <div class="youtube-auto-content">
+          <div class="youtube-auto-platform"><i class="fab fa-youtube"></i> YouTube • détection automatique</div>
+          <h3 id="youtubeAutoTitle">LTcine TV est en direct</h3>
+          <p id="youtubeAutoChecked">Direct détecté automatiquement.</p>
+          <a id="youtubeAutoLink" class="youtube-auto-btn" href="https://www.youtube.com/channel/UCD56Xq7Nn9EM9_sDTBmMxVw/live" target="_blank" rel="noopener noreferrer">
+            <i class="fas fa-play"></i> Regarder le direct
+          </a>
+        </div>
+      </div>
+
       <div class="live-grid" id="liveGrid">
         <div class="skeleton-grid" aria-hidden="true">
           <div class="skeleton-card"></div>
@@ -2309,12 +2337,17 @@
           <form id="memberLoginForm" class="member-form">
             <div>
               <label for="memberLoginEmail">Adresse e-mail</label>
-              <input id="memberLoginEmail" class="member-input" type="email" autocomplete="username" required>
+              <input id="memberLoginEmail" class="member-input" type="email" maxlength="120" autocomplete="username" required>
             </div>
             <div>
               <label for="memberLoginPassword">Mot de passe</label>
               <input id="memberLoginPassword" class="member-input" type="password" autocomplete="current-password" required>
             </div>
+
+            <button class="forgot-password-btn" id="forgotPasswordBtn" type="button">
+              Mot de passe oublié ?
+            </button>
+
             <button class="member-submit" type="submit">
               <i class="fas fa-right-to-bracket"></i> Se connecter
             </button>
@@ -2329,25 +2362,6 @@
           <div class="account-divider"><span>ou</span></div>
 
           <form id="memberRegisterForm" class="member-form">
-            <div class="member-form-grid">
-              <div>
-                <label for="memberFirstName">Prénom</label>
-                <input id="memberFirstName" class="member-input" type="text" maxlength="60" autocomplete="given-name" required>
-              </div>
-              <div>
-                <label for="memberLastName">Nom</label>
-                <input id="memberLastName" class="member-input" type="text" maxlength="60" autocomplete="family-name" required>
-              </div>
-              <div>
-                <label for="memberAge">Âge</label>
-                <input id="memberAge" class="member-input" type="number" min="13" max="120" required>
-              </div>
-              <div>
-                <label for="memberCity">Ville</label>
-                <input id="memberCity" class="member-input" type="text" maxlength="100" autocomplete="address-level2" required>
-              </div>
-            </div>
-
             <div>
               <label for="memberEmail">Adresse e-mail</label>
               <input id="memberEmail" class="member-input" type="email" maxlength="120" autocomplete="email" required>
@@ -2358,19 +2372,14 @@
               <input id="memberPassword" class="member-input" type="password" minlength="8" maxlength="128" autocomplete="new-password" required>
             </div>
 
-            <label class="member-check">
-              <input id="memberEmailOptIn" type="checkbox" checked>
-              <span>J'accepte de recevoir les informations et messages de LTcine TV par e-mail.</span>
-            </label>
-
-            <label class="member-check">
-              <input id="memberPrivacyConsent" type="checkbox" required>
-              <span>J'accepte que ces informations soient utilisées pour gérer mon compte et la communication avec LTcine TV.</span>
-            </label>
-
             <button class="member-submit" id="memberRegisterBtn" type="submit">
               <i class="fas fa-user-plus"></i> Créer mon compte
             </button>
+
+            <p class="account-privacy-note">
+              En créant un compte, votre adresse e-mail sert uniquement à gérer votre espace LTcine TV.
+              L'inscription aux communications reste facultative dans votre compte.
+            </p>
           </form>
         </div>
       </div>
@@ -2385,26 +2394,15 @@
           </div>
         </div>
 
-        <form id="memberProfileForm" class="member-form">
-          <div class="member-form-grid">
-            <div>
-              <label for="profileFirstName">Prénom</label>
-              <input id="profileFirstName" class="member-input" type="text" maxlength="60" required>
-            </div>
-            <div>
-              <label for="profileLastName">Nom</label>
-              <input id="profileLastName" class="member-input" type="text" maxlength="60" required>
-            </div>
-            <div>
-              <label for="profileAge">Âge</label>
-              <input id="profileAge" class="member-input" type="number" min="13" max="120" required>
-            </div>
-            <div>
-              <label for="profileCity">Ville</label>
-              <input id="profileCity" class="member-input" type="text" maxlength="100" required>
-            </div>
+        <div class="member-identity-card">
+          <div>
+            <span class="member-identity-label">Compte connecté</span>
+            <strong id="memberIdentityValue">—</strong>
           </div>
+          <span class="member-provider-badge" id="memberProviderBadge">Compte LTcine</span>
+        </div>
 
+        <form id="memberProfileForm" class="member-form">
           <label class="member-check">
             <input id="profileEmailOptIn" type="checkbox">
             <span>Je souhaite recevoir les informations et messages de LTcine TV par e-mail.</span>
@@ -3126,6 +3124,76 @@
       return card;
     }
 
+
+    const YOUTUBE_CHANNEL_ID = 'UCD56Xq7Nn9EM9_sDTBmMxVw';
+    const YOUTUBE_LIVE_STATUS_URL = 'youtube-live.json';
+
+    function formatYouTubeCheckTime(value) {
+      if (!value) return '';
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return '';
+      return new Intl.DateTimeFormat('fr-FR', {
+        dateStyle: 'short',
+        timeStyle: 'short'
+      }).format(d);
+    }
+
+    function hideYouTubeLive() {
+      $('#youtubeLiveAlert')?.classList.add('hidden');
+      $('#youtubeAutoLive')?.classList.add('hidden');
+    }
+
+    function renderYouTubeLive(status) {
+      if (!status || status.isLive !== true || !status.videoId) {
+        hideYouTubeLive();
+        return;
+      }
+
+      const url = safeExternalUrl(status.url) || `https://www.youtube.com/watch?v=${encodeURIComponent(status.videoId)}`;
+      const title = normalizeText(status.title, 220) || 'LTcine TV est en direct';
+      const thumb = safeExternalUrl(status.thumbnail);
+      const checked = formatYouTubeCheckTime(status.checkedAt || status.lastSuccessfulCheck);
+
+      if ($('#youtubeLiveAlertTitle')) $('#youtubeLiveAlertTitle').textContent = title;
+      if ($('#youtubeLiveAlertLink')) $('#youtubeLiveAlertLink').href = url;
+      $('#youtubeLiveAlert')?.classList.remove('hidden');
+
+      if ($('#youtubeAutoTitle')) $('#youtubeAutoTitle').textContent = title;
+      if ($('#youtubeAutoLink')) $('#youtubeAutoLink').href = url;
+      if ($('#youtubeAutoChecked')) {
+        $('#youtubeAutoChecked').textContent = checked
+          ? `Direct détecté automatiquement • vérifié ${checked}`
+          : 'Direct détecté automatiquement sur YouTube.';
+      }
+
+      const img = $('#youtubeAutoThumbnail');
+      if (img) {
+        if (thumb) {
+          img.src = thumb;
+          img.style.display = '';
+        } else {
+          img.removeAttribute('src');
+          img.style.display = 'none';
+        }
+      }
+
+      $('#youtubeAutoLive')?.classList.remove('hidden');
+    }
+
+    async function loadYouTubeLiveStatus() {
+      try {
+        const response = await fetch(`${YOUTUBE_LIVE_STATUS_URL}?t=${Date.now()}`, {
+          cache: 'no-store'
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const status = await response.json();
+        renderYouTubeLive(status);
+      } catch (error) {
+        console.warn('Statut YouTube Live indisponible:', error);
+        hideYouTubeLive();
+      }
+    }
+
     async function loadLive() {
       const grid = $('#liveGrid');
 
@@ -3312,68 +3380,59 @@
     /* =========================================================
        ESPACE MEMBRE
     ========================================================= */
-    async function syncMemberSubscription(user, profile) {
-      if (!user || !user.email) return;
+    function splitGoogleDisplayName(displayName) {
+      const clean = normalizeText(displayName, 130);
+      if (!clean) return { displayName: '', firstName: '', lastName: '' };
+      const parts = clean.split(/\s+/).filter(Boolean);
+      const firstName = parts.shift() || '';
+      return { displayName: clean, firstName, lastName: parts.join(' ') };
+    }
+
+    async function syncMemberSubscription(user, emailOptIn, displayName = '') {
+      if (!user?.email) return;
       const ref = db.collection('subscribers').doc(user.uid);
       await ref.set({
-        name: `${normalizeText(profile.firstName,60)} ${normalizeText(profile.lastName,60)}`.trim(),
+        name: normalizeText(displayName,130) || normalizeText(user.email,120),
         email: normalizeText(user.email,120).toLowerCase(),
-        active: Boolean(profile.emailOptIn),
+        active: Boolean(emailOptIn),
         source: 'member-account',
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       }, { merge: true });
     }
 
-    async function saveMemberProfile(user, profile, isNew = false) {
-      if (!user) return;
-
-      const firstName = normalizeText(profile.firstName, 60);
-      const lastName = normalizeText(profile.lastName, 60);
-      const city = normalizeText(profile.city, 100);
-      const age = Number(profile.age);
-
-      if (!firstName || !lastName || !city || !Number.isFinite(age) || age < 13 || age > 120) {
-        throw new Error('Veuillez compléter correctement prénom, nom, âge et ville.');
-      }
-
-      const payload = {
-        uid: user.uid,
-        email: normalizeText(user.email || profile.email, 120).toLowerCase(),
-        firstName,
-        lastName,
-        age,
-        city,
-        emailOptIn: Boolean(profile.emailOptIn),
-        provider: profile.provider || (user.providerData?.[0]?.providerId || 'password'),
-        profileComplete: true,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      };
-
-      if (isNew) payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-
-      await db.collection('users').doc(user.uid).set(payload, { merge: true });
-      await syncMemberSubscription(user, payload);
-    }
-
-    async function ensureGoogleMemberProfile(user) {
+    async function ensureMemberProfile(user) {
       const ref = db.collection('users').doc(user.uid);
       const snap = await ref.get();
-      if (snap.exists) return snap.data();
+      if (snap.exists) {
+        const current = snap.data();
+        const googleName = user.providerData?.some(p => p.providerId === 'google.com')
+          ? normalizeText(user.displayName,130)
+          : '';
 
-      const display = normalizeText(user.displayName, 130).split(/\s+/).filter(Boolean);
-      const firstName = display.shift() || '';
-      const lastName = display.join(' ');
+        if (googleName && !current.displayName) {
+          const parts = splitGoogleDisplayName(googleName);
+          await ref.set({
+            displayName: parts.displayName,
+            firstName: parts.firstName,
+            lastName: parts.lastName,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true });
+          return { ...current, ...parts };
+        }
+        return current;
+      }
+
+      const isGoogle = user.providerData?.some(p => p.providerId === 'google.com');
+      const parts = isGoogle ? splitGoogleDisplayName(user.displayName) : { displayName:'', firstName:'', lastName:'' };
 
       const payload = {
         uid: user.uid,
-        email: normalizeText(user.email, 120).toLowerCase(),
-        firstName,
-        lastName,
-        age: null,
-        city: '',
+        email: normalizeText(user.email,120).toLowerCase(),
+        displayName: parts.displayName,
+        firstName: parts.firstName,
+        lastName: parts.lastName,
         emailOptIn: false,
-        provider: 'google.com',
-        profileComplete: false,
+        provider: isGoogle ? 'google.com' : 'password',
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
@@ -3382,48 +3441,53 @@
       return payload;
     }
 
+    async function saveCommunicationPreference(user, emailOptIn) {
+      if (!user) return;
+      const profile = await ensureMemberProfile(user);
+      await db.collection('users').doc(user.uid).set({
+        emailOptIn: Boolean(emailOptIn),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+      await syncMemberSubscription(user, Boolean(emailOptIn), profile.displayName || user.displayName || '');
+    }
+
     function showMemberGuest() {
       $('#memberGuestView')?.classList.remove('hidden');
       $('#memberAccountView')?.classList.add('hidden');
       $('#accountBtn')?.classList.remove('signed-in');
       if ($('#accountLabel')) $('#accountLabel').textContent = 'Connexion';
-      if ($('#accountBtn')) $('#accountBtn').setAttribute('aria-label','Se connecter ou créer un compte');
+      if ($('#accountBtn')) {
+        $('#accountBtn').setAttribute('aria-label','Se connecter ou créer un compte');
+        $('#accountBtn').setAttribute('title','Mon compte');
+      }
     }
 
     function showMemberAccount(user, profile = {}) {
       $('#memberGuestView')?.classList.add('hidden');
       $('#memberAccountView')?.classList.remove('hidden');
 
-      const first = normalizeText(profile.firstName, 60);
-      const last = normalizeText(profile.lastName, 60);
+      const displayName = normalizeText(profile.displayName || user.displayName,130);
+      const email = normalizeText(user.email || profile.email,120);
+      const identity = displayName || email || 'Mon compte';
 
       $('#accountBtn')?.classList.add('signed-in');
-
-      const fullName = [first, last].filter(Boolean).join(' ').trim();
-      const displayIdentity = fullName || normalizeText(user.email, 120) || 'Mon compte';
-
-      if ($('#accountLabel')) $('#accountLabel').textContent = displayIdentity;
+      if ($('#accountLabel')) $('#accountLabel').textContent = identity;
       if ($('#accountBtn')) {
-        $('#accountBtn').setAttribute('aria-label', `Compte : ${displayIdentity}`);
-        $('#accountBtn').setAttribute('title', displayIdentity);
+        $('#accountBtn').setAttribute('aria-label', `Compte : ${identity}`);
+        $('#accountBtn').setAttribute('title', identity);
       }
 
-      if ($('#memberWelcome')) $('#memberWelcome').textContent = displayIdentity;
-      if ($('#memberAccountEmail')) {
-        $('#memberAccountEmail').textContent = fullName ? normalizeText(user.email, 120) : '';
+      if ($('#memberWelcome')) $('#memberWelcome').textContent = displayName ? `Bienvenue ${displayName}` : 'Mon compte';
+      if ($('#memberAccountEmail')) $('#memberAccountEmail').textContent = displayName ? email : '';
+      if ($('#memberIdentityValue')) $('#memberIdentityValue').textContent = identity;
+      if ($('#memberProviderBadge')) {
+        const google = (profile.provider || '').includes('google') || user.providerData?.some(p => p.providerId === 'google.com');
+        $('#memberProviderBadge').textContent = google ? 'Google' : 'E-mail';
       }
-      if ($('#profileFirstName')) $('#profileFirstName').value = first;
-      if ($('#profileLastName')) $('#profileLastName').value = last;
-      if ($('#profileAge')) $('#profileAge').value = profile.age || '';
-      if ($('#profileCity')) $('#profileCity').value = normalizeText(profile.city, 100);
       if ($('#profileEmailOptIn')) $('#profileEmailOptIn').checked = Boolean(profile.emailOptIn);
-
-      if (!profile.profileComplete) {
-        showToast('Complétez votre âge et votre ville pour finaliser votre profil.', 'success');
-      }
     }
 
-    $('#googleSignInBtn')?.addEventListener('click', async () => {
+    async function startGoogleSignIn() {
       if (isEmbeddedBrowser()) {
         showToast('Ouvrez LTcine TV dans Chrome, Firefox, Safari ou votre navigateur habituel pour utiliser Google.', 'error');
         updateOAuthBrowserWarning();
@@ -3431,13 +3495,12 @@
       }
 
       const btn = $('#googleSignInBtn');
-      btn.disabled = true;
+      if (btn) btn.disabled = true;
 
       try {
         await auth.signInWithPopup(googleProvider);
       } catch (error) {
         console.error('Connexion Google:', error);
-
         const messages = {
           'auth/unauthorized-domain': "Ce domaine n'est pas encore autorisé dans Firebase Authentication.",
           'auth/operation-not-allowed': "La connexion Google n'est pas encore activée dans Firebase Authentication.",
@@ -3445,54 +3508,31 @@
           'auth/popup-closed-by-user': "La fenêtre Google a été fermée avant la fin de la connexion.",
           'auth/cancelled-popup-request': "Une autre tentative de connexion est déjà en cours."
         };
-
         showToast(messages[error?.code] || 'Connexion Google impossible pour le moment.', 'error');
       } finally {
-        btn.disabled = false;
+        if (btn) btn.disabled = false;
       }
-    });
+    }
+
+    $('#googleSignInBtn')?.addEventListener('click', startGoogleSignIn);
+    $('#googleRegisterBtn')?.addEventListener('click', startGoogleSignIn);
 
     $('#memberRegisterForm')?.addEventListener('submit', async event => {
       event.preventDefault();
 
       const button = $('#memberRegisterBtn');
-      const firstName = normalizeText($('#memberFirstName').value, 60);
-      const lastName = normalizeText($('#memberLastName').value, 60);
-      const city = normalizeText($('#memberCity').value, 100);
-      const age = Number($('#memberAge').value);
-      const email = normalizeText($('#memberEmail').value, 120).toLowerCase();
+      const email = normalizeText($('#memberEmail').value,120).toLowerCase();
       const password = $('#memberPassword').value;
-
-      if (!$('#memberPrivacyConsent').checked) {
-        showToast("Votre accord est nécessaire pour créer le compte.", 'error');
-        return;
-      }
-
-      if (!firstName || !lastName || !city || age < 13 || age > 120) {
-        showToast('Veuillez compléter correctement le formulaire.', 'error');
-        return;
-      }
 
       button.disabled = true;
       button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Création…';
 
       try {
         const credential = await auth.createUserWithEmailAndPassword(email, password);
-        await credential.user.updateProfile({ displayName: `${firstName} ${lastName}`.trim() });
-
-        await saveMemberProfile(credential.user, {
-          firstName,
-          lastName,
-          age,
-          city,
-          email,
-          emailOptIn: $('#memberEmailOptIn').checked,
-          provider: 'password'
-        }, true);
-
+        await ensureMemberProfile(credential.user);
         showToast('Votre compte LTcine TV a été créé.', 'success');
         event.currentTarget.reset();
-        setTimeout(closeAccountModal, 500);
+        setTimeout(closeAccountModal, 450);
       } catch (error) {
         console.error('Création compte:', error);
         const messages = {
@@ -3513,14 +3553,35 @@
 
       try {
         await auth.signInWithEmailAndPassword(
-          normalizeText($('#memberLoginEmail').value, 120),
+          normalizeText($('#memberLoginEmail').value,120).toLowerCase(),
           $('#memberLoginPassword').value
         );
         showToast('Connexion réussie.', 'success');
-        setTimeout(closeAccountModal, 450);
+        setTimeout(closeAccountModal, 350);
       } catch (error) {
         console.error('Connexion membre:', error);
         showToast('E-mail ou mot de passe incorrect.', 'error');
+      }
+    });
+
+    $('#forgotPasswordBtn')?.addEventListener('click', async () => {
+      const email = normalizeText($('#memberLoginEmail').value,120).toLowerCase();
+      if (!email) {
+        showToast("Entrez d'abord votre adresse e-mail.", 'error');
+        $('#memberLoginEmail')?.focus();
+        return;
+      }
+
+      try {
+        await auth.sendPasswordResetEmail(email);
+        showToast('Un e-mail de réinitialisation vient de vous être envoyé.', 'success');
+      } catch (error) {
+        console.error('Réinitialisation mot de passe:', error);
+        const messages = {
+          'auth/invalid-email': 'Adresse e-mail invalide.',
+          'auth/user-not-found': "Aucun compte n'est associé à cette adresse."
+        };
+        showToast(messages[error?.code] || "Impossible d'envoyer l'e-mail de réinitialisation.", 'error');
       }
     });
 
@@ -3529,21 +3590,13 @@
       if (!auth.currentUser) return;
 
       try {
-        await saveMemberProfile(auth.currentUser, {
-          firstName: $('#profileFirstName').value,
-          lastName: $('#profileLastName').value,
-          age: $('#profileAge').value,
-          city: $('#profileCity').value,
-          emailOptIn: $('#profileEmailOptIn').checked,
-          provider: auth.currentUser.providerData?.[0]?.providerId || 'password'
-        });
-
+        await saveCommunicationPreference(auth.currentUser, $('#profileEmailOptIn').checked);
         const snap = await db.collection('users').doc(auth.currentUser.uid).get();
         showMemberAccount(auth.currentUser, snap.exists ? snap.data() : {});
-        showToast('Profil enregistré.', 'success');
+        showToast('Préférence enregistrée.', 'success');
       } catch (error) {
         console.error(error);
-        showToast(error.message || 'Impossible d’enregistrer le profil.', 'error');
+        showToast("Impossible d'enregistrer votre préférence.", 'error');
       }
     });
 
@@ -3560,8 +3613,7 @@
       }
 
       try {
-        const snap = await db.collection('users').doc(user.uid).get();
-        const profile = snap.exists ? snap.data() : await ensureGoogleMemberProfile(user);
+        const profile = await ensureMemberProfile(user);
         showMemberAccount(user, profile || {});
       } catch (error) {
         console.error('Profil membre:', error);
@@ -3644,6 +3696,7 @@
         loadTicker(),
         loadVerse(),
         loadNews(),
+        loadYouTubeLiveStatus(),
         loadLive(),
         loadDownloads()
       ]);
