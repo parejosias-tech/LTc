@@ -5,6 +5,7 @@
   "title": null,
   "thumbnail": null,
   "url": "https://www.youtube.com/channel/UCD56Xq7Nn9EM9_sDTBmMxVw/live",
-  "checkedAt": null,
-  "apiOk": false
+  "checkedAt": "2026-10-01T11:48:05.913938Z",
+  "apiOk": false,
+  "error": "HTTP Error 403: Forbidden"
 }
