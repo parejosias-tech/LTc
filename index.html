@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Lato:wght@400;700;900&family=Montserrat:wght@400;500;600;700;800;900&family=Nunito:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800;900&family=Roboto:wght@400;500;700;900&family=Source+Sans+3:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
@@ -36,6 +36,8 @@
       --success: #25D366;
       --danger: #EF4444;
       --header-height: 90px;
+      --site-font: 'Poppins', sans-serif;
+      --heading-font: 'Poppins', sans-serif;
       --glow-blue: 0 0 0 1px rgba(47,107,255,.18), 0 10px 30px rgba(47,107,255,.16), inset 0 1px 0 rgba(255,255,255,.06);
       --glow-gold: 0 0 0 1px rgba(244,207,93,.16), 0 10px 24px rgba(244,207,93,.10), inset 0 1px 0 rgba(255,255,255,.08);
     }
@@ -46,7 +48,7 @@
     }
 
     body {
-      font-family: 'Poppins', sans-serif;
+      font-family: var(--site-font);
       color: var(--text-main);
       min-height: 100vh;
       overflow-x: hidden;
@@ -74,6 +76,11 @@
 
     body.menu-open,
     body.modal-open { overflow: hidden; }
+
+    h1, h2, h3, h4, h5, h6,
+    .site-title, .section-title, .share-title {
+      font-family: var(--heading-font);
+    }
 
     img { display: block; max-width: 100%; }
 
@@ -281,6 +288,206 @@
         linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04)),
         rgba(8,14,28,.84);
     }
+
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 9px;
+    }
+
+    .account-btn {
+      min-height: 50px;
+      padding: 6px 13px 6px 7px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.12);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025)),
+        rgba(8,14,28,.74);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      cursor: pointer;
+      transition: transform .2s ease, background .2s ease, border-color .2s ease;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+    }
+
+    .account-btn:hover {
+      transform: translateY(-1px);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.035)),
+        rgba(8,14,28,.84);
+      border-color: rgba(94,142,255,.28);
+    }
+
+    .account-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: linear-gradient(135deg,var(--brand-blue),#1D4ED8);
+      box-shadow: 0 7px 18px rgba(47,107,255,.18);
+      flex: 0 0 auto;
+    }
+
+    .account-label {
+      font-size: .82rem;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .account-btn.signed-in .account-icon {
+      background: linear-gradient(135deg,var(--brand-yellow),#EAB308);
+      color: #111827;
+    }
+
+    .account-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 3600;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity .22s ease, visibility .22s ease;
+    }
+
+    .account-modal.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .account-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(2,6,12,.80);
+      backdrop-filter: blur(9px);
+      -webkit-backdrop-filter: blur(9px);
+    }
+
+    .account-dialog {
+      position: relative;
+      z-index: 1;
+      width: min(560px,100%);
+      max-height: 92dvh;
+      overflow-y: auto;
+      padding: 1.45rem;
+      border-radius: 24px;
+      background:
+        linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.022)),
+        rgba(7,13,26,.96);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 30px 90px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.05);
+    }
+
+    .account-modal-close {
+      position: absolute;
+      right: 14px;
+      top: 14px;
+      width: 39px;
+      height: 39px;
+      border: 0;
+      border-radius: 50%;
+      color: #fff;
+      background: rgba(255,255,255,.08);
+      cursor: pointer;
+    }
+
+    .account-dialog-head {
+      display: grid;
+      grid-template-columns: 50px minmax(0,1fr);
+      gap: 12px;
+      align-items: center;
+      padding-right: 44px;
+      margin-bottom: 1.15rem;
+    }
+
+    .account-dialog-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: linear-gradient(135deg,var(--brand-blue),#1D4ED8);
+    }
+
+    .account-dialog-head h2 {
+      color: #fff;
+      font-size: 1.35rem;
+      margin: 1px 0 2px;
+    }
+
+    .account-dialog-head p {
+      color: var(--text-muted);
+      font-size: .82rem;
+    }
+
+    .account-kicker {
+      color: var(--brand-yellow);
+      font-size: .7rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .account-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      padding: 5px;
+      margin-bottom: 1rem;
+      border-radius: 14px;
+      background: rgba(255,255,255,.045);
+      border: 1px solid rgba(255,255,255,.06);
+    }
+
+    .account-tab {
+      min-height: 42px;
+      border: 0;
+      border-radius: 10px;
+      color: var(--text-muted);
+      background: transparent;
+      font-weight: 750;
+      cursor: pointer;
+    }
+
+    .account-tab.active {
+      color: #fff;
+      background: linear-gradient(135deg,rgba(47,107,255,.88),rgba(29,78,216,.86));
+      box-shadow: 0 7px 18px rgba(47,107,255,.14);
+    }
+
+    .account-pane { display: none; }
+    .account-pane.active { display: block; }
+
+    .account-divider {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 1rem 0;
+      color: rgba(255,255,255,.38);
+      font-size: .74rem;
+    }
+
+    .account-divider::before,
+    .account-divider::after {
+      content: "";
+      height: 1px;
+      flex: 1;
+      background: rgba(255,255,255,.07);
+    }
+
+    .account-divider span { padding: 0 10px; }
+
 
     /* SIDE MENU */
     .menu-backdrop {
@@ -520,7 +727,7 @@
     .hero h1 {
       position: relative;
       z-index: 1;
-      font-family: 'Playfair Display', serif;
+      font-family: var(--heading-font);
       font-size: clamp(2.3rem, 6vw, 4.8rem);
       line-height: 1.04;
       font-weight: 900;
@@ -710,7 +917,7 @@
     }
 
     .verse-text {
-      font-family: 'Playfair Display', serif;
+      font-family: var(--heading-font);
       font-style: italic;
       line-height: 1.85;
       font-size: clamp(1.05rem, 2vw, 1.35rem);
@@ -1136,6 +1343,86 @@
       font-size: .86rem;
       line-height: 1.6;
     }
+
+    .about-scripture-note {
+      margin-top: 1.15rem;
+      padding: 1rem;
+      display: grid;
+      grid-template-columns: 36px minmax(0,1fr);
+      gap: 10px;
+      align-items: start;
+      border-radius: 14px;
+      color: rgba(241,245,255,.86);
+      background: rgba(244,207,93,.055);
+      border: 1px solid rgba(244,207,93,.14);
+    }
+
+    .about-scripture-note > i {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      color: var(--brand-yellow);
+    }
+
+    .about-scripture-note p {
+      margin: 0;
+      font-size: .85rem;
+      line-height: 1.65;
+    }
+
+    .hidden { display: none !important; }
+
+    .member-account {
+      padding: 1.35rem;
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.018)),
+        rgba(7,13,27,.56);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .member-account h3 { color: #fff; margin-bottom: .45rem; }
+    .member-account-head p { color: var(--text-muted); font-size: .88rem; line-height: 1.65; }
+
+    .member-google-btn, .member-submit, .member-secondary-btn {
+      width: 100%; min-height: 46px; border: 0; border-radius: 12px; margin-top: 1rem;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      font-weight: 750; cursor: pointer; transition: transform .2s ease,filter .2s ease;
+    }
+
+    .member-google-btn { background: #fff; color: #111827; }
+    .member-submit { background: linear-gradient(135deg,var(--brand-blue),#1D4ED8); color: #fff; }
+    .member-secondary-btn { background: rgba(255,255,255,.07); color: #fff; border: 1px solid rgba(255,255,255,.09); }
+    .member-google-btn:hover, .member-submit:hover, .member-secondary-btn:hover { transform: translateY(-1px); filter: brightness(1.04); }
+
+    .member-small { margin-top: .75rem !important; font-size: .76rem !important; }
+    .member-form { display: grid; gap: .85rem; margin-top: 1rem; }
+    .member-form-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .85rem; }
+    .member-form label { display: block; color: rgba(255,255,255,.82); font-size: .8rem; margin-bottom: 5px; }
+
+    .member-input {
+      width: 100%; min-height: 45px; padding: 10px 12px; border-radius: 11px;
+      border: 1px solid rgba(255,255,255,.10); outline: none; color: #fff;
+      background: rgba(255,255,255,.055);
+    }
+
+    .member-input:focus { border-color: rgba(94,142,255,.52); box-shadow: 0 0 0 4px rgba(47,107,255,.08); }
+
+    .member-check { display: grid !important; grid-template-columns: 18px minmax(0,1fr); gap: 9px; align-items: start; margin: 0 !important; }
+    .member-check input { width: 17px; height: 17px; accent-color: var(--brand-blue); margin-top: 2px; }
+    .member-check span { color: var(--text-muted); font-size: .76rem; line-height: 1.5; }
+
+    .member-login-details { margin-top: 1rem; border-top: 1px solid rgba(255,255,255,.07); padding-top: .8rem; }
+    .member-login-details summary { cursor: pointer; color: rgba(255,255,255,.75); font-size: .82rem; }
+    .member-login-form { margin-top: .8rem; }
+
+    .member-account { position: relative; z-index: 1; }
+    .member-account-head { display: grid; grid-template-columns: 54px minmax(0,1fr); gap: 13px; align-items: center; margin-bottom: 1rem; }
+    .member-avatar { width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(135deg,var(--brand-blue),var(--brand-yellow)); color: #091225; }
+    .member-kicker { color: var(--brand-yellow); text-transform: uppercase; letter-spacing: .07em; font-size: .72rem; font-weight: 800; }
+    .member-account-actions { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: .8rem; }
+    .member-account-actions .member-secondary-btn { width: auto; padding-inline: 1rem; }
 
     /* SHARE / WHATSAPP */
     .share-section {
@@ -1599,6 +1886,10 @@
 
     @media (max-width: 600px) {
       .menu-btn { width: 46px; height: 46px; }
+      .account-btn { width: 46px; height: 46px; padding: 0; justify-content: center; border-radius: 15px; }
+      .account-icon { width: 34px; height: 34px; }
+      .account-label { display: none; }
+      .header-actions { gap: 7px; }
       .ticker-container { height: 48px; }
       .ticker-label { min-width: 92px; font-size: .84rem; }
       .ticker-item { padding: 0 24px; font-size: .9rem; }
@@ -1613,6 +1904,8 @@
       .news-grid, .live-grid, .downloads-grid { grid-template-columns: 1fr; }
       .media-intro { grid-template-columns: 1fr; }
       .about-content { grid-template-columns: 1fr; }
+      .member-form-grid { grid-template-columns: 1fr; }
+      .member-account-actions { grid-template-columns: 1fr; }
       .media-capabilities { grid-template-columns: 1fr 1fr; }
       .news-image { height: 190px; }
       .category-list { grid-template-columns: 1fr; }
@@ -1650,6 +1943,7 @@
       <a href="#accueil" class="logo-container" aria-label="LTcine TV - Accueil">
         <div class="logo-badge">
           <img
+            id="siteLogo"
             class="logo-image"
             src="https://i.ibb.co/Q7NBvsD7/LT-20260319-205453-0000.png"
             alt="Logo LTcine TV"
@@ -1659,8 +1953,8 @@
           >
         </div>
         <div class="site-title-wrap">
-          <span class="site-title">LTcine <span class="accent">TV</span></span>
-          <span class="site-subtitle">Actualités • Reportages • Évangélisation</span>
+          <span class="site-title" id="siteTitleText">LTcine <span class="accent">TV</span></span>
+          <span class="site-subtitle" id="siteSubtitleText">Actualités • Reportages • Évangélisation</span>
         </div>
       </a>
 
@@ -1675,9 +1969,16 @@
         </button>
       </div>
 
-      <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="sideMenu" aria-label="Ouvrir le menu">
-        <i class="fas fa-bars"></i>
-      </button>
+      <div class="header-actions">
+        <button class="account-btn" id="accountBtn" type="button" aria-label="Se connecter ou créer un compte" title="Mon compte">
+          <span class="account-icon"><i class="fas fa-user"></i></span>
+          <span class="account-label" id="accountLabel">Connexion</span>
+        </button>
+
+        <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="sideMenu" aria-label="Ouvrir le menu">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -1707,14 +2008,6 @@
       <div class="menu-section-title">Catégories</div>
       <div class="category-list" id="categoryList">
         <button class="category-btn active" data-category="all"><i class="fas fa-layer-group"></i> Tout afficher</button>
-        <button class="category-btn" data-category="actualites"><i class="fas fa-newspaper"></i> Actualités</button>
-        <button class="category-btn" data-category="reportages"><i class="fas fa-video"></i> Reportages</button>
-        <button class="category-btn" data-category="publicites"><i class="fas fa-bullhorn"></i> Publicités</button>
-        <button class="category-btn" data-category="debats"><i class="fas fa-comments"></i> Débats</button>
-        <button class="category-btn" data-category="micro-trottoirs"><i class="fas fa-microphone"></i> Micro-trottoirs</button>
-        <button class="category-btn" data-category="evangelisation"><i class="fas fa-cross"></i> Évangélisation</button>
-        <button class="category-btn" data-category="mariage"><i class="fas fa-heart"></i> Mariage</button>
-        <button class="category-btn" data-category="message"><i class="fas fa-message"></i> Message</button>
       </div>
     </div>
   </aside>
@@ -1732,8 +2025,8 @@
   <section class="hero hero-compact" id="accueil">
     <div class="hero-content hero-content-compact">
       <div class="hero-badge"><i class="fas fa-circle" style="font-size:.48rem;"></i> LTcine TV</div>
-      <h1>L'information, les messages et vos événements en un seul espace</h1>
-      <p>
+      <h1 id="heroTitle">L'information, les messages et vos événements en un seul espace</h1>
+      <p id="heroText">
         Actualités, reportages, messages, photos, vidéos et galeries de prestations.
       </p>
     </div>
@@ -1806,8 +2099,8 @@
       <div class="media-intro">
         <div class="media-intro-text">
           <span class="media-kicker">Vos événements, accessibles simplement</span>
-          <h3>Retrouvez votre reportage, vos photos ou vos vidéos</h3>
-          <p>
+          <h3 id="galleryIntroTitle">Retrouvez votre reportage, vos photos ou vos vidéos</h3>
+          <p id="galleryIntroText">
             Après une prestation LTcine TV, recherchez votre événement ci-dessous puis ouvrez
             directement sa galerie ou son espace média.
           </p>
@@ -1828,53 +2121,60 @@
       </div>
     </section>
 
-
     <section class="section about-section" id="a-propos">
       <div class="section-header">
         <div class="section-icon"><i class="fas fa-circle-info"></i></div>
         <div>
           <h2 class="section-title">À propos de LTcine TV</h2>
-          <p class="section-subtitle">Notre raison d'être et notre vision</p>
+          <p class="section-subtitle">Un média digital pour communiquer, servir et édifier</p>
         </div>
       </div>
 
       <div class="about-content">
         <div class="about-main">
-          <span class="about-kicker">Notre mission</span>
-          <h3>Faciliter la communication et contribuer à l'édification du corps de Christ</h3>
-          <p>
-            LTcine TV veut réunir, à travers le digital, ceux qui reconnaissent Jésus-Christ
-            comme le socle de leur salut et reconnaissent la suffisance de son œuvre.
+          <span class="about-kicker">Notre vision</span>
+          <h3 id="aboutTitle">Christ au centre, la communication au service de l'édification</h3>
+          <p id="aboutText1">
+            LTcine TV est une plateforme média et digitale qui souhaite faciliter la communication
+            entre ceux qui confessent Jésus-Christ comme Seigneur et reconnaissent en lui le fondement
+            du salut. Dans l'esprit d'Éphésiens 4, nous voulons contribuer à l'édification du corps de Christ,
+            dans l'amour, la vérité et le respect.
           </p>
-          <p>
-            La plateforme ne cherche pas à effacer la diversité des sensibilités chrétiennes,
-            mais à créer un espace de communication, de partage et d'édification autour de
-            ce fondement commun : Jésus-Christ.
+          <p id="aboutText2">
+            LTcine TV n'est ni une Église locale, ni une dénomination, ni une autorité doctrinale.
+            La plateforme ne prétend pas effacer les différences entre communautés chrétiennes :
+            elle offre un espace de diffusion, de témoignage, d'information et de service autour
+            du fondement commun qu'est Jésus-Christ. Chaque contenu doit être reçu avec discernement,
+            dans le respect des Écritures et de la responsabilité des Églises locales.
           </p>
+          <div class="about-scripture-note">
+            <i class="fas fa-book-bible"></i>
+            <p><strong>Repères bibliques :</strong> Éphésiens 4:1-16 • 1 Corinthiens 12:12-27 • 1 Thessaloniciens 5:21.</p>
+          </div>
         </div>
 
         <div class="about-pillars">
           <article>
             <i class="fas fa-cross"></i>
             <div>
-              <h4>Christ au centre</h4>
-              <p>Jésus-Christ demeure le fondement commun de la plateforme.</p>
+              <h4>Jésus-Christ, le fondement</h4>
+              <p>La communication de LTcine TV s'inscrit autour de la personne et de l'œuvre de Jésus-Christ.</p>
             </div>
           </article>
 
           <article>
             <i class="fas fa-people-group"></i>
             <div>
-              <h4>Unité dans la diversité</h4>
-              <p>Créer des ponts et faciliter la communication entre les différentes sensibilités.</p>
+              <h4>Édification du corps</h4>
+              <p>Informer, témoigner et créer des liens afin de servir l'édification dans l'amour.</p>
             </div>
           </article>
 
           <article>
-            <i class="fas fa-mobile-screen-button"></i>
+            <i class="fas fa-scale-balanced"></i>
             <div>
-              <h4>Édification par le digital</h4>
-              <p>Mettre les médias, les messages, la photo et la vidéo au service de l'édification.</p>
+              <h4>Respect et discernement</h4>
+              <p>LTcine TV demeure un média : les contenus publiés ne remplacent ni l'Écriture ni l'accompagnement d'une Église locale.</p>
             </div>
           </article>
         </div>
@@ -1890,13 +2190,13 @@
         </p>
 
         <div class="whatsapp-card">
-          <a href="https://wa.me/22673669104" target="_blank" rel="noopener noreferrer" class="whatsapp-btn">
+          <a id="whatsappLink" href="https://wa.me/22673669104" target="_blank" rel="noopener noreferrer" class="whatsapp-btn">
             <span class="whatsapp-icon-wrap" aria-hidden="true">
               <i class="fab fa-whatsapp"></i>
             </span>
             <span class="whatsapp-text">
               <span class="whatsapp-label">Contact WhatsApp</span>
-              <span class="whatsapp-number">+226 73 66 91 04</span>
+              <span class="whatsapp-number" id="whatsappNumber">+226 73 66 91 04</span>
             </span>
           </a>
         </div>
@@ -1931,19 +2231,167 @@
     </section>
   </main>
 
+
+  <div class="account-modal" id="accountModal" aria-hidden="true">
+    <div class="account-modal-backdrop" id="accountModalBackdrop"></div>
+
+    <div class="account-dialog" role="dialog" aria-modal="true" aria-labelledby="accountDialogTitle">
+      <button class="account-modal-close" id="accountModalClose" type="button" aria-label="Fermer">
+        <i class="fas fa-times"></i>
+      </button>
+
+      <div class="account-dialog-head">
+        <div class="account-dialog-icon"><i class="fas fa-user"></i></div>
+        <div>
+          <span class="account-kicker">LTcine TV</span>
+          <h2 id="accountDialogTitle">Mon compte</h2>
+          <p>Connectez-vous ou créez votre espace membre.</p>
+        </div>
+      </div>
+
+      <div id="memberGuestView">
+        <div class="account-tabs" role="tablist" aria-label="Connexion ou inscription">
+          <button class="account-tab active" id="loginTabBtn" type="button">Se connecter</button>
+          <button class="account-tab" id="registerTabBtn" type="button">Créer un compte</button>
+        </div>
+
+        <div class="account-pane active" id="loginPane">
+          <button class="member-google-btn" id="googleSignInBtn" type="button">
+            <i class="fab fa-google"></i> Continuer avec Google
+          </button>
+
+          <div class="account-divider"><span>ou</span></div>
+
+          <form id="memberLoginForm" class="member-form">
+            <div>
+              <label for="memberLoginEmail">Adresse e-mail</label>
+              <input id="memberLoginEmail" class="member-input" type="email" autocomplete="username" required>
+            </div>
+            <div>
+              <label for="memberLoginPassword">Mot de passe</label>
+              <input id="memberLoginPassword" class="member-input" type="password" autocomplete="current-password" required>
+            </div>
+            <button class="member-submit" type="submit">
+              <i class="fas fa-right-to-bracket"></i> Se connecter
+            </button>
+          </form>
+        </div>
+
+        <div class="account-pane" id="registerPane">
+          <button class="member-google-btn" id="googleRegisterBtn" type="button">
+            <i class="fab fa-google"></i> S'inscrire avec Google
+          </button>
+
+          <div class="account-divider"><span>ou</span></div>
+
+          <form id="memberRegisterForm" class="member-form">
+            <div class="member-form-grid">
+              <div>
+                <label for="memberFirstName">Prénom</label>
+                <input id="memberFirstName" class="member-input" type="text" maxlength="60" autocomplete="given-name" required>
+              </div>
+              <div>
+                <label for="memberLastName">Nom</label>
+                <input id="memberLastName" class="member-input" type="text" maxlength="60" autocomplete="family-name" required>
+              </div>
+              <div>
+                <label for="memberAge">Âge</label>
+                <input id="memberAge" class="member-input" type="number" min="13" max="120" required>
+              </div>
+              <div>
+                <label for="memberCity">Ville</label>
+                <input id="memberCity" class="member-input" type="text" maxlength="100" autocomplete="address-level2" required>
+              </div>
+            </div>
+
+            <div>
+              <label for="memberEmail">Adresse e-mail</label>
+              <input id="memberEmail" class="member-input" type="email" maxlength="120" autocomplete="email" required>
+            </div>
+
+            <div>
+              <label for="memberPassword">Mot de passe</label>
+              <input id="memberPassword" class="member-input" type="password" minlength="8" maxlength="128" autocomplete="new-password" required>
+            </div>
+
+            <label class="member-check">
+              <input id="memberEmailOptIn" type="checkbox" checked>
+              <span>J'accepte de recevoir les informations et messages de LTcine TV par e-mail.</span>
+            </label>
+
+            <label class="member-check">
+              <input id="memberPrivacyConsent" type="checkbox" required>
+              <span>J'accepte que ces informations soient utilisées pour gérer mon compte et la communication avec LTcine TV.</span>
+            </label>
+
+            <button class="member-submit" id="memberRegisterBtn" type="submit">
+              <i class="fas fa-user-plus"></i> Créer mon compte
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div id="memberAccountView" class="member-account hidden">
+        <div class="member-account-head">
+          <div class="member-avatar"><i class="fas fa-user"></i></div>
+          <div>
+            <span class="member-kicker">Votre espace membre</span>
+            <h3 id="memberWelcome">Bienvenue</h3>
+            <p id="memberAccountEmail"></p>
+          </div>
+        </div>
+
+        <form id="memberProfileForm" class="member-form">
+          <div class="member-form-grid">
+            <div>
+              <label for="profileFirstName">Prénom</label>
+              <input id="profileFirstName" class="member-input" type="text" maxlength="60" required>
+            </div>
+            <div>
+              <label for="profileLastName">Nom</label>
+              <input id="profileLastName" class="member-input" type="text" maxlength="60" required>
+            </div>
+            <div>
+              <label for="profileAge">Âge</label>
+              <input id="profileAge" class="member-input" type="number" min="13" max="120" required>
+            </div>
+            <div>
+              <label for="profileCity">Ville</label>
+              <input id="profileCity" class="member-input" type="text" maxlength="100" required>
+            </div>
+          </div>
+
+          <label class="member-check">
+            <input id="profileEmailOptIn" type="checkbox">
+            <span>Je souhaite recevoir les informations et messages de LTcine TV par e-mail.</span>
+          </label>
+
+          <div class="member-account-actions">
+            <button class="member-submit" type="submit">
+              <i class="fas fa-floppy-disk"></i> Enregistrer
+            </button>
+            <button class="member-secondary-btn" id="memberSignOutBtn" type="button">
+              <i class="fas fa-right-from-bracket"></i> Déconnexion
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <footer>
     <div class="footer-content">
       <div class="footer-section">
         <h3>LTcine TV</h3>
         <p>Une plateforme digitale chrétienne dédiée à la communication, à l'unité en Christ et à l'édification du corps de Christ.</p>
         <div class="social-links">
-          <a href="https://www.facebook.com/share/1CBdvAu4oc/" target="_blank" rel="noopener noreferrer" class="social-link" title="Facebook" aria-label="Facebook">
+          <a id="facebookLink" href="https://www.facebook.com/share/1CBdvAu4oc/" target="_blank" rel="noopener noreferrer" class="social-link" title="Facebook" aria-label="Facebook">
             <i class="fab fa-facebook-f"></i>
           </a>
-          <a href="https://www.youtube.com/@ltcinetv" target="_blank" rel="noopener noreferrer" class="social-link" title="YouTube" aria-label="YouTube">
+          <a id="youtubeLink" href="https://www.youtube.com/@ltcinetv" target="_blank" rel="noopener noreferrer" class="social-link" title="YouTube" aria-label="YouTube">
             <i class="fab fa-youtube"></i>
           </a>
-          <a href="https://tiktok.com/@ltcinetv" target="_blank" rel="noopener noreferrer" class="social-link" title="TikTok" aria-label="TikTok">
+          <a id="tiktokLink" href="https://tiktok.com/@ltcinetv" target="_blank" rel="noopener noreferrer" class="social-link" title="TikTok" aria-label="TikTok">
             <i class="fab fa-tiktok"></i>
           </a>
         </div>
@@ -1962,9 +2410,9 @@
 
       <div class="footer-section">
         <h3>Contact</h3>
-        <p><i class="fab fa-whatsapp"></i> +226 73 66 91 04</p>
-        <p><i class="fas fa-envelope"></i> ltcine@gmail.com</p>
-        <p><i class="fas fa-map-marker-alt"></i> Burkina Faso</p>
+        <p><i class="fab fa-whatsapp"></i> <span id="footerWhatsapp">+226 73 66 91 04</span></p>
+        <p><i class="fas fa-envelope"></i> <span id="footerEmail">ltcine@gmail.com</span></p>
+        <p><i class="fas fa-map-marker-alt"></i> <span id="footerLocation">Burkina Faso</span></p>
       </div>
     </div>
 
@@ -1995,9 +2443,13 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    const auth = firebase.auth();
+    const googleProvider = new firebase.auth.GoogleAuthProvider();
 
     const state = {
       news: [],
+      categories: [],
+      siteSettings: {},
       activeCategory: 'all',
       search: '',
       refreshTimer: null
@@ -2023,6 +2475,40 @@
       'evangelisation': 'Évangélisation',
       'mariage': 'Mariage',
       'message': 'Message'
+    };
+
+    const DEFAULT_CATEGORIES = [
+      {slug:'actualites',label:'Actualités',icon:'fa-newspaper',order:10,active:true},
+      {slug:'reportages',label:'Reportages',icon:'fa-video',order:20,active:true},
+      {slug:'publicites',label:'Publicités',icon:'fa-bullhorn',order:30,active:true},
+      {slug:'debats',label:'Débats',icon:'fa-comments',order:40,active:true},
+      {slug:'micro-trottoirs',label:'Micro-trottoirs',icon:'fa-microphone',order:50,active:true},
+      {slug:'evangelisation',label:'Évangélisation',icon:'fa-cross',order:60,active:true},
+      {slug:'mariage',label:'Mariage',icon:'fa-heart',order:70,active:true},
+      {slug:'message',label:'Message',icon:'fa-message',order:80,active:true}
+    ];
+
+    const DEFAULT_SETTINGS = {
+      siteName:'LTcine TV',
+      tagline:'Actualités • Reportages • Évangélisation',
+      logoUrl:'https://i.ibb.co/Q7NBvsD7/LT-20260319-205453-0000.png',
+      heroTitle:"L'information, les messages et vos événements en un seul espace",
+      heroText:'Actualités, reportages, messages, photos, vidéos et galeries de prestations.',
+      searchPlaceholder:'Rechercher une actualité, un reportage, un message…',
+      aboutTitle:"Christ au centre, la communication au service de l'édification",
+      aboutText1:"LTcine TV est une plateforme média et digitale qui souhaite faciliter la communication entre ceux qui confessent Jésus-Christ comme Seigneur et reconnaissent en lui le fondement du salut. Dans l'esprit d'Éphésiens 4, nous voulons contribuer à l'édification du corps de Christ, dans l'amour, la vérité et le respect.",
+      aboutText2:"LTcine TV n'est ni une Église locale, ni une dénomination, ni une autorité doctrinale. La plateforme ne prétend pas effacer les différences entre communautés chrétiennes : elle offre un espace de diffusion, de témoignage, d'information et de service autour du fondement commun qu'est Jésus-Christ. Chaque contenu doit être reçu avec discernement, dans le respect des Écritures et de la responsabilité des Églises locales.",
+      whatsapp:'+226 73 66 91 04',
+      email:'ltcine@gmail.com',
+      location:'Burkina Faso',
+      facebook:'https://www.facebook.com/share/1CBdvAu4oc/',
+      youtube:'https://www.youtube.com/@ltcinetv',
+      tiktok:'https://tiktok.com/@ltcinetv',
+      galleryTitle:'Retrouvez votre reportage, vos photos ou vos vidéos',
+      galleryText:"Après une prestation LTcine TV, recherchez votre événement puis ouvrez directement sa galerie ou son espace média.",
+      tickerSpeed:18,
+      bodyFont:'Poppins',
+      headingFont:'Poppins'
     };
 
     const $ = (selector, parent = document) => parent.querySelector(selector);
@@ -2108,6 +2594,156 @@
         if (modal) closeArticleModal(modal);
       }
     });
+
+
+    /* =========================================================
+       RÉGLAGES DU SITE & CATÉGORIES DYNAMIQUES
+    ========================================================= */
+    function formatSiteName(name) {
+      const el = $('#siteTitleText');
+      if (!el) return;
+      const clean = normalizeText(name, 80) || 'LTcine TV';
+      const parts = clean.split(/\s+/);
+      if (parts.length > 1) {
+        const last = parts.pop();
+        el.replaceChildren(document.createTextNode(parts.join(' ') + ' '));
+        const accent = document.createElement('span');
+        accent.className = 'accent';
+        accent.textContent = last;
+        el.appendChild(accent);
+      } else {
+        el.textContent = clean;
+      }
+    }
+
+    function whatsappHref(number) {
+      const digits = normalizeText(number, 40).replace(/\D/g, '');
+      return digits ? `https://wa.me/${digits}` : '#';
+    }
+
+    function applyExternalLink(el, value) {
+      if (!el) return;
+      const url = safeExternalUrl(value);
+      if (url) {
+        el.href = url;
+        el.style.display = '';
+      } else {
+        el.style.display = 'none';
+      }
+    }
+
+    function applySiteSettings(data) {
+      const s = { ...DEFAULT_SETTINGS, ...(data || {}) };
+      state.siteSettings = s;
+
+      formatSiteName(s.siteName);
+      if ($('#siteSubtitleText')) $('#siteSubtitleText').textContent = normalizeText(s.tagline, 160);
+      if ($('#heroTitle')) $('#heroTitle').textContent = normalizeText(s.heroTitle, 180);
+      if ($('#heroText')) $('#heroText').textContent = normalizeText(s.heroText, 900);
+      if ($('#globalSearch')) $('#globalSearch').placeholder = normalizeText(s.searchPlaceholder, 140);
+      if ($('#aboutTitle')) $('#aboutTitle').textContent = normalizeText(s.aboutTitle, 180);
+      if ($('#aboutText1')) $('#aboutText1').textContent = normalizeText(s.aboutText1, 1800);
+      if ($('#aboutText2')) $('#aboutText2').textContent = normalizeText(s.aboutText2, 1800);
+      if ($('#galleryIntroTitle')) $('#galleryIntroTitle').textContent = normalizeText(s.galleryTitle, 180);
+      if ($('#galleryIntroText')) $('#galleryIntroText').textContent = normalizeText(s.galleryText, 900);
+
+      const logo = safeExternalUrl(s.logoUrl);
+      if (logo && $('#siteLogo')) $('#siteLogo').src = logo;
+
+      if ($('#whatsappNumber')) $('#whatsappNumber').textContent = normalizeText(s.whatsapp, 40);
+      if ($('#footerWhatsapp')) $('#footerWhatsapp').textContent = normalizeText(s.whatsapp, 40);
+      if ($('#whatsappLink')) $('#whatsappLink').href = whatsappHref(s.whatsapp);
+
+      if ($('#footerEmail')) $('#footerEmail').textContent = normalizeText(s.email, 120);
+      if ($('#footerLocation')) $('#footerLocation').textContent = normalizeText(s.location, 120);
+
+      applyExternalLink($('#facebookLink'), s.facebook);
+      applyExternalLink($('#youtubeLink'), s.youtube);
+      applyExternalLink($('#tiktokLink'), s.tiktok);
+
+      const allowedFonts = ['Poppins','Inter','Roboto','Open Sans','Montserrat','Lato','Nunito','Source Sans 3'];
+      const bodyFont = allowedFonts.includes(s.bodyFont) ? s.bodyFont : 'Poppins';
+      const headingFont = allowedFonts.includes(s.headingFont) ? s.headingFont : 'Poppins';
+      document.documentElement.style.setProperty('--site-font', `'${bodyFont}', sans-serif`);
+      document.documentElement.style.setProperty('--heading-font', `'${headingFont}', sans-serif`);
+
+      const speed = Math.max(8, Math.min(80, Number(s.tickerSpeed) || 18));
+      if ($('#tickerContent')) $('#tickerContent').style.animationDuration = `${speed}s`;
+
+      document.title = `${normalizeText(s.siteName,80) || 'LTcine TV'} - Actualités • Reportages • Évangélisation`;
+    }
+
+    async function loadSiteSettings() {
+      try {
+        const snap = await db.collection('siteSettings').doc('general').get();
+        applySiteSettings(snap.exists ? snap.data() : DEFAULT_SETTINGS);
+      } catch (error) {
+        console.error('Erreur réglages du site:', error);
+        applySiteSettings(DEFAULT_SETTINGS);
+      }
+    }
+
+    function bindCategoryButtons() {
+      $$('.category-btn').forEach(button => {
+        button.onclick = () => {
+          state.activeCategory = button.dataset.category || 'all';
+          $$('.category-btn').forEach(btn => btn.classList.toggle('active', btn === button));
+          renderNews();
+          closeMenu(false);
+          $('#actualites').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+      });
+    }
+
+    function renderCategoryMenu(categories) {
+      const box = $('#categoryList');
+      if (!box) return;
+      box.replaceChildren();
+
+      const all = document.createElement('button');
+      all.className = `category-btn ${state.activeCategory === 'all' ? 'active' : ''}`;
+      all.dataset.category = 'all';
+      all.innerHTML = '<i class="fas fa-layer-group"></i> Tout afficher';
+      box.appendChild(all);
+
+      categories
+        .filter(c => c.active !== false)
+        .sort((a,b)=>(Number(a.order)||0)-(Number(b.order)||0))
+        .forEach(c => {
+          const slug = normalizeText(c.slug || c.id, 80).toLowerCase();
+          const label = normalizeText(c.label || slug, 80);
+          const icon = normalizeText(c.icon || 'fa-tag', 80);
+
+          categoryLabels[slug] = label;
+          categoryIcons[slug] = icon;
+
+          const btn = document.createElement('button');
+          btn.className = `category-btn ${state.activeCategory === slug ? 'active' : ''}`;
+          btn.dataset.category = slug;
+
+          const i = document.createElement('i');
+          i.className = `fas ${icon}`;
+          btn.append(i, document.createTextNode(` ${label}`));
+          box.appendChild(btn);
+        });
+
+      bindCategoryButtons();
+    }
+
+    async function loadCategories() {
+      try {
+        const snap = await db.collection('categories').orderBy('order', 'asc').get();
+        state.categories = snap.empty
+          ? DEFAULT_CATEGORIES
+          : snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderCategoryMenu(state.categories);
+        if (state.news.length) renderNews();
+      } catch (error) {
+        console.error('Erreur catégories:', error);
+        state.categories = DEFAULT_CATEGORIES;
+        renderCategoryMenu(DEFAULT_CATEGORIES);
+      }
+    }
 
     function renderTicker(items) {
       const container = $('#tickerContent');
@@ -2575,18 +3211,300 @@
       $('#globalSearch').focus();
     });
 
-    $$('.category-btn').forEach(button => {
-      button.addEventListener('click', () => {
-        state.activeCategory = button.dataset.category || 'all';
 
-        $$('.category-btn').forEach(btn => {
-          btn.classList.toggle('active', btn === button);
+
+
+    /* =========================================================
+       FENÊTRE COMPTE
+    ========================================================= */
+    function openAccountModal(tab = 'login') {
+      $('#accountModal')?.classList.add('open');
+      $('#accountModal')?.setAttribute('aria-hidden','false');
+      document.body.classList.add('modal-open');
+      switchAccountTab(tab);
+    }
+
+    function closeAccountModal() {
+      $('#accountModal')?.classList.remove('open');
+      $('#accountModal')?.setAttribute('aria-hidden','true');
+      document.body.classList.remove('modal-open');
+    }
+
+    function switchAccountTab(tab) {
+      const login = tab !== 'register';
+      $('#loginTabBtn')?.classList.toggle('active', login);
+      $('#registerTabBtn')?.classList.toggle('active', !login);
+      $('#loginPane')?.classList.toggle('active', login);
+      $('#registerPane')?.classList.toggle('active', !login);
+    }
+
+    $('#accountBtn')?.addEventListener('click', () => openAccountModal(auth.currentUser ? 'login' : 'login'));
+    $('#accountModalClose')?.addEventListener('click', closeAccountModal);
+    $('#accountModalBackdrop')?.addEventListener('click', closeAccountModal);
+    $('#loginTabBtn')?.addEventListener('click', () => switchAccountTab('login'));
+    $('#registerTabBtn')?.addEventListener('click', () => switchAccountTab('register'));
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && $('#accountModal')?.classList.contains('open')) {
+        closeAccountModal();
+      }
+    });
+
+    $('#googleRegisterBtn')?.addEventListener('click', () => $('#googleSignInBtn')?.click());
+
+    /* =========================================================
+       ESPACE MEMBRE
+    ========================================================= */
+    async function syncMemberSubscription(user, profile) {
+      if (!user || !user.email) return;
+      const ref = db.collection('subscribers').doc(user.uid);
+      await ref.set({
+        name: `${normalizeText(profile.firstName,60)} ${normalizeText(profile.lastName,60)}`.trim(),
+        email: normalizeText(user.email,120).toLowerCase(),
+        active: Boolean(profile.emailOptIn),
+        source: 'member-account',
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+    }
+
+    async function saveMemberProfile(user, profile, isNew = false) {
+      if (!user) return;
+
+      const firstName = normalizeText(profile.firstName, 60);
+      const lastName = normalizeText(profile.lastName, 60);
+      const city = normalizeText(profile.city, 100);
+      const age = Number(profile.age);
+
+      if (!firstName || !lastName || !city || !Number.isFinite(age) || age < 13 || age > 120) {
+        throw new Error('Veuillez compléter correctement prénom, nom, âge et ville.');
+      }
+
+      const payload = {
+        uid: user.uid,
+        email: normalizeText(user.email || profile.email, 120).toLowerCase(),
+        firstName,
+        lastName,
+        age,
+        city,
+        emailOptIn: Boolean(profile.emailOptIn),
+        provider: profile.provider || (user.providerData?.[0]?.providerId || 'password'),
+        profileComplete: true,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      if (isNew) payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+
+      await db.collection('users').doc(user.uid).set(payload, { merge: true });
+      await syncMemberSubscription(user, payload);
+    }
+
+    async function ensureGoogleMemberProfile(user) {
+      const ref = db.collection('users').doc(user.uid);
+      const snap = await ref.get();
+      if (snap.exists) return snap.data();
+
+      const display = normalizeText(user.displayName, 130).split(/\s+/).filter(Boolean);
+      const firstName = display.shift() || '';
+      const lastName = display.join(' ');
+
+      const payload = {
+        uid: user.uid,
+        email: normalizeText(user.email, 120).toLowerCase(),
+        firstName,
+        lastName,
+        age: null,
+        city: '',
+        emailOptIn: false,
+        provider: 'google.com',
+        profileComplete: false,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      await ref.set(payload, { merge: true });
+      return payload;
+    }
+
+    function showMemberGuest() {
+      $('#memberGuestView')?.classList.remove('hidden');
+      $('#memberAccountView')?.classList.add('hidden');
+      $('#accountBtn')?.classList.remove('signed-in');
+      if ($('#accountLabel')) $('#accountLabel').textContent = 'Connexion';
+      if ($('#accountBtn')) $('#accountBtn').setAttribute('aria-label','Se connecter ou créer un compte');
+    }
+
+    function showMemberAccount(user, profile = {}) {
+      $('#memberGuestView')?.classList.add('hidden');
+      $('#memberAccountView')?.classList.remove('hidden');
+
+      const first = normalizeText(profile.firstName, 60);
+      const last = normalizeText(profile.lastName, 60);
+
+      $('#accountBtn')?.classList.add('signed-in');
+
+      const fullName = [first, last].filter(Boolean).join(' ').trim();
+      const displayIdentity = fullName || normalizeText(user.email, 120) || 'Mon compte';
+
+      if ($('#accountLabel')) $('#accountLabel').textContent = displayIdentity;
+      if ($('#accountBtn')) {
+        $('#accountBtn').setAttribute('aria-label', `Compte : ${displayIdentity}`);
+        $('#accountBtn').setAttribute('title', displayIdentity);
+      }
+
+      if ($('#memberWelcome')) $('#memberWelcome').textContent = displayIdentity;
+      if ($('#memberAccountEmail')) {
+        $('#memberAccountEmail').textContent = fullName ? normalizeText(user.email, 120) : '';
+      }
+      if ($('#profileFirstName')) $('#profileFirstName').value = first;
+      if ($('#profileLastName')) $('#profileLastName').value = last;
+      if ($('#profileAge')) $('#profileAge').value = profile.age || '';
+      if ($('#profileCity')) $('#profileCity').value = normalizeText(profile.city, 100);
+      if ($('#profileEmailOptIn')) $('#profileEmailOptIn').checked = Boolean(profile.emailOptIn);
+
+      if (!profile.profileComplete) {
+        showToast('Complétez votre âge et votre ville pour finaliser votre profil.', 'success');
+      }
+    }
+
+    $('#googleSignInBtn')?.addEventListener('click', async () => {
+      const btn = $('#googleSignInBtn');
+      btn.disabled = true;
+
+      try {
+        await auth.signInWithPopup(googleProvider);
+      } catch (error) {
+        console.error('Connexion Google:', error);
+
+        if (error?.code === 'auth/popup-blocked') {
+          try {
+            await auth.signInWithRedirect(googleProvider);
+            return;
+          } catch (redirectError) {
+            console.error('Redirection Google:', redirectError);
+          }
+        }
+
+        showToast('Connexion Google impossible pour le moment.', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    $('#memberRegisterForm')?.addEventListener('submit', async event => {
+      event.preventDefault();
+
+      const button = $('#memberRegisterBtn');
+      const firstName = normalizeText($('#memberFirstName').value, 60);
+      const lastName = normalizeText($('#memberLastName').value, 60);
+      const city = normalizeText($('#memberCity').value, 100);
+      const age = Number($('#memberAge').value);
+      const email = normalizeText($('#memberEmail').value, 120).toLowerCase();
+      const password = $('#memberPassword').value;
+
+      if (!$('#memberPrivacyConsent').checked) {
+        showToast("Votre accord est nécessaire pour créer le compte.", 'error');
+        return;
+      }
+
+      if (!firstName || !lastName || !city || age < 13 || age > 120) {
+        showToast('Veuillez compléter correctement le formulaire.', 'error');
+        return;
+      }
+
+      button.disabled = true;
+      button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Création…';
+
+      try {
+        const credential = await auth.createUserWithEmailAndPassword(email, password);
+        await credential.user.updateProfile({ displayName: `${firstName} ${lastName}`.trim() });
+
+        await saveMemberProfile(credential.user, {
+          firstName,
+          lastName,
+          age,
+          city,
+          email,
+          emailOptIn: $('#memberEmailOptIn').checked,
+          provider: 'password'
+        }, true);
+
+        showToast('Votre compte LTcine TV a été créé.', 'success');
+        event.currentTarget.reset();
+        setTimeout(closeAccountModal, 500);
+      } catch (error) {
+        console.error('Création compte:', error);
+        const messages = {
+          'auth/email-already-in-use': 'Cette adresse e-mail possède déjà un compte.',
+          'auth/weak-password': 'Choisissez un mot de passe d’au moins 8 caractères.',
+          'auth/invalid-email': 'Adresse e-mail invalide.',
+          'auth/operation-not-allowed': 'La connexion par e-mail/mot de passe doit être activée dans Firebase Authentication.'
+        };
+        showToast(messages[error?.code] || 'Création du compte impossible.', 'error');
+      } finally {
+        button.disabled = false;
+        button.innerHTML = '<i class="fas fa-user-plus"></i> Créer mon compte';
+      }
+    });
+
+    $('#memberLoginForm')?.addEventListener('submit', async event => {
+      event.preventDefault();
+
+      try {
+        await auth.signInWithEmailAndPassword(
+          normalizeText($('#memberLoginEmail').value, 120),
+          $('#memberLoginPassword').value
+        );
+        showToast('Connexion réussie.', 'success');
+        setTimeout(closeAccountModal, 450);
+      } catch (error) {
+        console.error('Connexion membre:', error);
+        showToast('E-mail ou mot de passe incorrect.', 'error');
+      }
+    });
+
+    $('#memberProfileForm')?.addEventListener('submit', async event => {
+      event.preventDefault();
+      if (!auth.currentUser) return;
+
+      try {
+        await saveMemberProfile(auth.currentUser, {
+          firstName: $('#profileFirstName').value,
+          lastName: $('#profileLastName').value,
+          age: $('#profileAge').value,
+          city: $('#profileCity').value,
+          emailOptIn: $('#profileEmailOptIn').checked,
+          provider: auth.currentUser.providerData?.[0]?.providerId || 'password'
         });
 
-        renderNews();
-        closeMenu(false);
-        $('#actualites').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
+        const snap = await db.collection('users').doc(auth.currentUser.uid).get();
+        showMemberAccount(auth.currentUser, snap.exists ? snap.data() : {});
+        showToast('Profil enregistré.', 'success');
+      } catch (error) {
+        console.error(error);
+        showToast(error.message || 'Impossible d’enregistrer le profil.', 'error');
+      }
+    });
+
+    $('#memberSignOutBtn')?.addEventListener('click', async () => {
+      await auth.signOut();
+      closeAccountModal();
+      showToast('Vous êtes déconnecté.', 'success');
+    });
+
+    auth.onAuthStateChanged(async user => {
+      if (!user) {
+        showMemberGuest();
+        return;
+      }
+
+      try {
+        const snap = await db.collection('users').doc(user.uid).get();
+        const profile = snap.exists ? snap.data() : await ensureGoogleMemberProfile(user);
+        showMemberAccount(user, profile || {});
+      } catch (error) {
+        console.error('Profil membre:', error);
+        showMemberAccount(user, {});
+      }
     });
 
     $('#subscribeForm').addEventListener('submit', async event => {
@@ -2659,6 +3577,8 @@
 
     async function loadAllData() {
       await Promise.allSettled([
+        loadSiteSettings(),
+        loadCategories(),
         loadTicker(),
         loadVerse(),
         loadNews(),
